@@ -6,7 +6,10 @@
   &:has(input[name="theme"][class="radioThemeLight"]:checked) {
     color-scheme: light;
   }
-  --text-size: clamp(1rem, 1.2rem, 2rem);
+  /* @link https://utopia.fyi/clamp/calculator?a=360,1240,16—28 */
+  --text-size: clamp(1rem, 0.6932rem + 1.3636vw, 1.75rem);
+  /* @link https://utopia.fyi/clamp/calculator?a=360,1240,10—14 */
+  --text-size-small: clamp(0.625rem, 0.5227rem + 0.4545vw, 0.875rem);
   --dark-bg-color: #2e2e2e;
   --dark-bot-color: #fb8c00;
   --dark-user-color: #ec407a;
