@@ -7,12 +7,12 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="./styles/base.css" />
-    <link rel="stylesheet" href="./styles/boardGrid.css" />
-    <link rel="stylesheet" href="./styles/gameReplayDialog.css" />
-    <link rel="stylesheet" href="./styles/settings.css" />
-    <link rel="stylesheet" href="./styles/icons.css" />
     <link rel="stylesheet" href="./styles/boardAnimations.css" />
+    <link rel="stylesheet" href="./styles/boardGrid.css" />
+    <link rel="stylesheet" href="./styles/dialogs.css" />
+    <link rel="stylesheet" href="./styles/icons.css" />
     <link rel="stylesheet" href="./styles/sameOriginTransitions.css" />
+    <link rel="stylesheet" href="./styles/settings.css" />
     <script src="./main.js" defer type="module"></script>
   </head>
   <body>
@@ -20,17 +20,17 @@
       <div class="wrapper">
         <div class="navbar">
           <div class="navbarRestart">
-            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
               <use href="./images/icons.svg#icon_restart"></use>
             </svg>
           </div>
           <div class="navbarSettings">
-            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
               <use href="./images/icons.svg#icon_settings"></use>
             </svg>
           </div>
           <div class="navbarDatabase">
-            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
               <use href="./images/icons.svg#icon_database"></use>
             </svg>
           </div>
@@ -247,24 +247,91 @@
           </div>
         </div>
       </div>
+      <dialog class="dialogAiWorkerTimeout">
+        <div class="dialogWorkerTimeoutContainer">
+          <div class="dialogConfirmCaption">
+            <p>
+              The game was resetted due to a timeout condition in the AI worker
+              thread.
+            </p>
+            <br /><br />
+            <p>Increase the timeout value or decrease the search tree depth.</p>
+          </div>
+          <div class="dialogConfirmUI">
+            <svg class="icon2 iconConfirm" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_confirm"></use>
+            </svg>
+          </div>
+        </div>
+      </dialog>
     </section>
     <section id="sectSettings">
       <header>
         <nav>
-          <a href="#sectHome">
-            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
-              <use href="./images/icons.svg#icon_back"></use>
+          <div>
+            <a href="#sectHome">
+              <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+                <use href="./images/icons.svg#icon_back"></use>
+              </svg>
+            </a>
+          </div>
+          <div>
+            <dialog class="dialogSettingsSave">
+              <div class="dialogConfirmContainer">
+                <div class="dialogConfirmCaption">
+                  <p>Save current settings?</p>
+                </div>
+                <div class="dialogConfirmUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
+                  </svg>
+                  <svg
+                    class="icon2 iconCancel"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_cancel"></use>
+                  </svg>
+                </div>
+              </div>
+            </dialog>
+            <svg class="icon2 iconSave" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_save"></use>
             </svg>
-          </a>
-          <svg class="icon2 iconSave" xmlns="http://www.w3.org/2000/svg">
-            <use href="./images/icons.svg#icon_save"></use>
-          </svg>
-          <svg class="icon2 iconRecycle" xmlns="http://www.w3.org/2000/svg">
-            <use href="./images/icons.svg#icon_recycle"></use>
-          </svg>
-          <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
-            <use href="./images/icons.svg#icon_github"></use>
-          </svg>
+          </div>
+          <div>
+            <dialog class="dialogSettingsRecycle">
+              <div class="dialogConfirmContainer">
+                <div class="dialogConfirmCaption">
+                  <p>Restore all settings to factory default?</p>
+                </div>
+                <div class="dialogConfirmUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
+                  </svg>
+                  <svg
+                    class="icon2 iconCancel"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_cancel"></use>
+                  </svg>
+                </div>
+              </div>
+            </dialog>
+            <svg class="icon2 iconRecycle" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_recycle"></use>
+            </svg>
+          </div>
+          <div>
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_github"></use>
+            </svg>
+          </div>
         </nav>
       </header>
       <main>
@@ -547,12 +614,32 @@
               <main>
                 <template>
                   <div class="panelGameId" data-db-key="">
-                    <div class="panelIntro">
-                      <p class="headerCaption"></p>
-                      <p class="gameStarted"></p>
-                      <p class="totalMoves"></p>
-                      <p class="winnerIs"></p>
-                      <button class="selectGameId"></button>
+                    <div class="subgridHeader">
+                      View and replay game history
+                    </div>
+                    <div class="subgridUiIcons">
+                      <svg
+                        class="icon2 cancelGameDialog"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <use href="./images/icons.svg#icon_back"></use>
+                      </svg>
+                      <svg
+                        class="icon2 selectGameId"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <use href="./images/icons.svg#icon_confirm"></use>
+                      </svg>
+                    </div>
+                    <div class="subgridGameIdItems">
+                      <div>game started</div>
+                      <div class="panelGameStarted"></div>
+                      <div>moves</div>
+                      <div class="panelTotalMoves"></div>
+                      <div>game status</div>
+                      <div class="panelGameFinished"></div>
+                      <div>winner</div>
+                      <div class="panelGameWinner"></div>
                     </div>
                   </div>
                 </template>
@@ -581,10 +668,24 @@
               <use href="./images/icons.svg#icon_replay"></use>
             </svg>
             <dialog class="dialogReplayCommit">
-              <div class="panelReplayCommit" data-last-bot-move="">
-                <p class="headerReplayRequest"></p>
-                <button class="confirmReplayRequest">CONFIRM</button>
-                <button class="cancelReplayRequest">CANCEL</button>
+              <div class="dialogConfirmContainer" data-last-bot-move="">
+                <div class="dialogConfirmCaption">
+                  <p>Replay after bot move # ?</p>
+                </div>
+                <div class="dialogConfirmUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
+                  </svg>
+                  <svg
+                    class="icon2 iconCancel"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_cancel"></use>
+                  </svg>
+                </div>
               </div>
             </dialog>
           </div>

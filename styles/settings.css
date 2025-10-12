@@ -19,9 +19,11 @@
       height: 20dvh;
       margin-top: 3vh;
       margin-top: 3dvh;
-      & a,
-      svg {
-        flex: 1;
+      & > div {
+        & a,
+        svg {
+          flex: 1;
+        }
       }
     }
   }

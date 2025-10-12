@@ -43,6 +43,11 @@ async function loadGameHistoryMove(advanceSteps) {
       moveSrcDomCell.classList.add("mark");
       moveTgtDomCell.classList.add("click");
     }
+    if (record.move === 0) {
+      record.boardState._playerState._twoPlayer.forEach((player) => {
+        player._turn = false;
+      });
+    }
     prettifyMoveNumber(record.move);
     refreshSidebars(record.boardState._playerState);
     updateLastBotMove(record.move, record.boardState._playerState);
@@ -115,12 +120,17 @@ function refreshSidebars(playerState) {
     playerBot.winner = logRecordDataBot._winner;
     Sidebar.playerMapHistory.get(playerUser).refreshDashboard();
     Sidebar.playerMapHistory.get(playerBot).refreshDashboard();
-    if (playerUser.turn === false) {
+    if (playerUser.turn === false && playerBot.turn === false) {
+      Sidebar.playerMapHistory.get(playerUser).unmarkDashboard();
+      Sidebar.playerMapHistory.get(playerBot).unmarkDashboard();
+    }
+    if (playerUser.turn === false && playerBot.turn === true) {
       Sidebar.playerMapHistory.get(playerUser).markDashboard();
       Sidebar.playerMapHistory.get(playerBot).unmarkDashboard();
-    } else {
-      Sidebar.playerMapHistory.get(playerBot).markDashboard();
+    }
+    if (playerUser.turn === true && playerBot.turn === false) {
       Sidebar.playerMapHistory.get(playerUser).unmarkDashboard();
+      Sidebar.playerMapHistory.get(playerBot).markDashboard();
     }
   } catch (error) {
     console.error(error.message);
@@ -130,9 +140,9 @@ function refreshSidebars(playerState) {
 
 function updateLastBotMove(moveNo, playerState) {
   const helperDiv = document.querySelector(
-    "#sectReplayLogger .panelReplayCommit"
+    "#sectReplayLogger .dialogReplayCommit .dialogConfirmContainer"
   );
-  const helperHeader = helperDiv.querySelector(".headerReplayRequest");
+  const helperHeader = helperDiv.querySelector(".dialogConfirmCaption p");
   if (isNaN(moveNo) || moveNo <= 1) {
     helperDiv.setAttribute("data-last-bot-move", "");
     return;
@@ -143,7 +153,7 @@ function updateLastBotMove(moveNo, playerState) {
   if (!logRecordDataBot || logRecordDataBot._turn === true) {
     return;
   }
-  helperHeader.textContent = `Replay after Last bot move #${moveNo} ?`;
+  helperHeader.textContent = `Replay after bot move ###${String(moveNo)} ?`;
   helperDiv.setAttribute("data-last-bot-move", String(moveNo));
 }
 
@@ -191,11 +201,20 @@ function replayToSelectedBoardState(record, domBoardState) {
 
 async function dialogSelectBtnEventHandler(event) {
   try {
-    const btn = event.target.closest(".selectGameId");
-    if (!btn || !(btn instanceof HTMLButtonElement)) {
+    const confirmIcon = event.target.closest(".selectGameId");
+    const cancelIcon = event.target.closest(".cancelGameDialog");
+    if (!confirmIcon && !cancelIcon) {
       return;
     }
-    const panel = btn.closest(".panelGameId");
+    if (cancelIcon) {
+      const dialog = cancelIcon.closest(".dialogUploadModal");
+      if (!dialog || !(dialog instanceof HTMLDialogElement)) {
+        throw new Error("cannot relocate dialog element for game replay");
+      }
+      dialog.close();
+      return;
+    }
+    const panel = confirmIcon.closest(".panelGameId");
     if (!panel || !(panel instanceof HTMLDivElement)) {
       throw new Error("cannot relocate scroll itemn panel for game replay");
     }
@@ -217,46 +236,42 @@ async function dialogSelectBtnEventHandler(event) {
   }
 }
 
-async function dialogCommitBtnEventHandler(event) {
+async function dialogReplayCommitEventHandler(event) {
   try {
-    const btnConfirm = event.target.closest(".confirmReplayRequest");
-    const btnCancel = event.target.closest(".cancelReplayRequest");
-    const clickedBtn = btnConfirm || btnCancel;
-    if (!clickedBtn || !(clickedBtn instanceof HTMLButtonElement)) {
+    const clickedIcon = event.target.closest("svg");
+    if (!clickedIcon || !(clickedIcon instanceof SVGSVGElement)) {
       return;
     }
-    const panel = clickedBtn.closest(".panelReplayCommit");
-    if (!panel || !(panel instanceof HTMLDivElement)) {
-      throw new Error("cannot relocate scroll item panel for game replay");
+    const dialog = event.target.closest(".dialogReplayCommit");
+    if (!dialog || !(dialog instanceof HTMLDialogElement)) {
+      return;
     }
-    const dialog = panel.closest(".dialogReplayCommit");
-    if (!dialog || !dialog instanceof HTMLDialogElement) {
-      throw new Error("cannot relocate dialog element for game replay");
+    const container = dialog.querySelector(".dialogConfirmContainer");
+    if (!container || !(container instanceof HTMLDivElement)) {
+      return;
     }
-    if (btnCancel && btnCancel instanceof HTMLButtonElement) {
+    const lastBotMove = Number(container.getAttribute("data-last-bot-move"));
+    if (isNaN(lastBotMove) || lastBotMove <= 1) {
       dialog.close();
       return;
     }
-    if (btnConfirm && btnConfirm instanceof HTMLButtonElement) {
-      const lastBotMove = Number(panel.getAttribute("data-last-bot-move"));
-      if (isNaN(lastBotMove) || lastBotMove <= 1) {
-        dialog.close();
-        return;
-      }
-      const reader = LoggerReader.currentSelectedInstance;
-      if (!reader) {
-        throw new Error("no logger reader instance selected for game replay");
-      }
-      await reader.fetchRecord(-Infinity);
-      const record = await reader.fetchRecord(lastBotMove);
-      resetGame(
-        BoardState.currentLiveInstance,
-        LoggerWriter.currentLiveInstance
-      );
-      replayToSelectedBoardState(record, BoardState.currentLiveInstance);
-      window.location.hash = "#sectHome";
+    if (clickedIcon.classList.contains("iconCancel")) {
       dialog.close();
+      return;
     }
+    if (!clickedIcon.classList.contains("iconConfirm")) {
+      return;
+    }
+    const reader = LoggerReader.currentSelectedInstance;
+    if (!reader) {
+      throw new Error("no logger reader instance selected for game replay");
+    }
+    await reader.fetchRecord(-Infinity);
+    const record = await reader.fetchRecord(lastBotMove);
+    resetGame(BoardState.currentLiveInstance, LoggerWriter.currentLiveInstance);
+    replayToSelectedBoardState(record, BoardState.currentLiveInstance);
+    window.location.hash = "#sectHome";
+    dialog.close();
   } catch (error) {
     console.error(error.message);
   }
@@ -266,5 +281,5 @@ export {
   loadGameHistoryMove,
   updateSvg,
   dialogSelectBtnEventHandler,
-  dialogCommitBtnEventHandler,
+  dialogReplayCommitEventHandler,
 };

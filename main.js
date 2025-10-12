@@ -45,7 +45,7 @@ import {
   loadGameHistoryMove,
   updateSvg,
   dialogSelectBtnEventHandler,
-  dialogCommitBtnEventHandler,
+  dialogReplayCommitEventHandler,
 } from "./modules/ReplayHistoryEventLoop.js";
 let aiWorker;
 let dbWorker;
@@ -191,7 +191,6 @@ function createPlayer() {
 function initBoardEventHandlers(
   domBoard,
   domBoardState,
-  aiWorker,
   settings,
   loggerWriter
 ) {
@@ -423,6 +422,85 @@ async function loadSettings(settings) {
   }
 }
 
+async function saveCurrentSettings(domInputs, dbSettings) {
+  const newWinningRules = structuredClone(Settings.factoryWinningRules);
+  const newSearchRules = structuredClone(Settings.factorySearchRules);
+  const newMaterialAdvantageConquered = structuredClone(
+    Settings.factoryMaterialAdvantageConquered
+  );
+  const newSafetyZoneProximity = structuredClone(
+    Settings.factorySafetyZoneProximity
+  );
+  const newMaterialAdvantageAccounted = structuredClone(
+    Settings.factoryMaterialAdvantageAccounted
+  );
+  domInputs.forEach((input, _) => {
+    switch (input.id) {
+      case "safetyTowers":
+        newWinningRules.settings.safetyZone = Number(input.value);
+        break;
+      case "opponentStones":
+        newWinningRules.settings.materialOpponent = Number(input.value);
+        break;
+      case "maxStackSize":
+        newWinningRules.settings.maxStackSize = Number(input.value);
+        break;
+      case "searchDepth":
+        newSearchRules.settings.depth = Number(input.value);
+        break;
+      case "searchTimeout":
+        newSearchRules.settings.timeout = Number(input.value);
+        break;
+      case "materialAdvantageConquered":
+        newMaterialAdvantageConquered.settings.totalWeight = Number(
+          input.value
+        );
+        break;
+      case "safetyZone1":
+        newSafetyZoneProximity.settings.weightRowDistance1 = Number(
+          input.value
+        );
+        break;
+      case "safetyZone2":
+        newSafetyZoneProximity.settings.weightRowDistance2 = Number(
+          input.value
+        );
+        break;
+      case "safetyZone3":
+        newSafetyZoneProximity.settings.weightRowDistance3 = Number(
+          input.value
+        );
+        break;
+      case "safetyZone4":
+        newSafetyZoneProximity.settings.weightRowDistance4 = Number(
+          input.value
+        );
+        break;
+      case "safetyZone5":
+        newSafetyZoneProximity.settings.weightRowDistance5 = Number(
+          input.value
+        );
+        break;
+      case "safetyZoneTotalWeight":
+        newSafetyZoneProximity.settings.totalWeight = Number(input.value);
+        break;
+      case "materialAdvantageAccounted":
+        newMaterialAdvantageAccounted.settings.totalWeight = Number(
+          input.value
+        );
+        break;
+      default:
+        throw new Error("unknown input element");
+    }
+  });
+  dbSettings.winningRules = newWinningRules;
+  dbSettings.searchRules = newSearchRules;
+  dbSettings.materialAdvantageConquered = newMaterialAdvantageConquered;
+  dbSettings.safetyZoneProximity = newSafetyZoneProximity;
+  dbSettings.materialAdvantageAccounted = newMaterialAdvantageAccounted;
+  await dbSettings.save();
+}
+
 /**
  * This function:
  * - Initially loads the persistent settings from the database and updates all input values.
@@ -440,9 +518,49 @@ async function loadSettings(settings) {
  */
 function initSettingsEventHandlers(settings) {
   const domSettings = document.getElementById("sectSettings");
+  const dialogSave = domSettings.querySelector(".dialogSettingsSave");
+  const dialogSaveCancel = dialogSave.querySelector(".iconCancel");
+  const dialogSaveConfirm = dialogSave.querySelector(".iconConfirm");
+  const dialogRecycle = domSettings.querySelector(".dialogSettingsRecycle");
+  const dialogRecycleCancel = dialogRecycle.querySelector(".iconCancel");
+  const dialogRecycleConfirm = dialogRecycle.querySelector(".iconConfirm");
   const inputs = Array.from(domSettings.getElementsByTagName("input"));
   const outputs = Array.from(domSettings.getElementsByTagName("output"));
   initRangeSlidersFromDb(settings, inputs, outputs);
+  dialogSaveCancel.addEventListener("click", (event) => {
+    try {
+      dialogSave.close();
+    } catch (error) {
+      console.log(error.message);
+    }
+  });
+  dialogSaveConfirm.addEventListener("click", async (event) => {
+    try {
+      await saveCurrentSettings(
+        Array.from(domSettings.getElementsByTagName("input")),
+        settings
+      );
+      dialogSave.close();
+    } catch (error) {
+      console.log(error.message);
+    }
+  });
+  dialogRecycleCancel.addEventListener("click", (event) => {
+    try {
+      dialogRecycle.close();
+    } catch (error) {
+      console.log(error.message);
+    }
+  });
+  dialogRecycleConfirm.addEventListener("click", async (event) => {
+    try {
+      await settings.restoreFactoryDefault();
+      initRangeSlidersFromDb(settings, inputs, outputs);
+      dialogRecycle.close();
+    } catch (error) {
+      console.log(error.message);
+    }
+  });
   domSettings.addEventListener("input", (event) => {
     try {
       const form = event.target.closest(".panel");
@@ -467,87 +585,12 @@ function initSettingsEventHandlers(settings) {
         return;
       }
       if (navIcon.classList.contains("iconSave")) {
-        const inputs = Array.from(domSettings.getElementsByTagName("input"));
-        const newWinningRules = structuredClone(Settings.factoryWinningRules);
-        const newSearchRules = structuredClone(Settings.factorySearchRules);
-        const newMaterialAdvantageConquered = structuredClone(
-          Settings.factoryMaterialAdvantageConquered
-        );
-        const newSafetyZoneProximity = structuredClone(
-          Settings.factorySafetyZoneProximity
-        );
-        const newMaterialAdvantageAccounted = structuredClone(
-          Settings.factoryMaterialAdvantageAccounted
-        );
-        inputs.forEach((input, _) => {
-          switch (input.id) {
-            case "safetyTowers":
-              newWinningRules.settings.safetyZone = Number(input.value);
-              break;
-            case "opponentStones":
-              newWinningRules.settings.materialOpponent = Number(input.value);
-              break;
-            case "maxStackSize":
-              newWinningRules.settings.maxStackSize = Number(input.value);
-              break;
-            case "searchDepth":
-              newSearchRules.settings.depth = Number(input.value);
-              break;
-            case "searchTimeout":
-              newSearchRules.settings.timeout = Number(input.value);
-              break;
-            case "materialAdvantageConquered":
-              newMaterialAdvantageConquered.settings.totalWeight = Number(
-                input.value
-              );
-              break;
-            case "safetyZone1":
-              newSafetyZoneProximity.settings.weightRowDistance1 = Number(
-                input.value
-              );
-              break;
-            case "safetyZone2":
-              newSafetyZoneProximity.settings.weightRowDistance2 = Number(
-                input.value
-              );
-              break;
-            case "safetyZone3":
-              newSafetyZoneProximity.settings.weightRowDistance3 = Number(
-                input.value
-              );
-              break;
-            case "safetyZone4":
-              newSafetyZoneProximity.settings.weightRowDistance4 = Number(
-                input.value
-              );
-              break;
-            case "safetyZone5":
-              newSafetyZoneProximity.settings.weightRowDistance5 = Number(
-                input.value
-              );
-              break;
-            case "safetyZoneTotalWeight":
-              newSafetyZoneProximity.settings.totalWeight = Number(input.value);
-              break;
-            case "materialAdvantageAccounted":
-              newMaterialAdvantageAccounted.settings.totalWeight = Number(
-                input.value
-              );
-              break;
-            default:
-              throw new Error("unknown input element");
-          }
-        });
-        settings.winningRules = newWinningRules;
-        settings.searchRules = newSearchRules;
-        settings.materialAdvantageConquered = newMaterialAdvantageConquered;
-        settings.safetyZoneProximity = newSafetyZoneProximity;
-        settings.materialAdvantageAccounted = newMaterialAdvantageAccounted;
-        await settings.save();
+        dialogSave.showModal();
+        return;
       }
       if (navIcon.classList.contains("iconRecycle")) {
-        await settings.restoreFactoryDefault();
-        initRangeSlidersFromDb(settings, inputs, outputs);
+        dialogRecycle.showModal();
+        return;
       }
     } catch (error) {
       console.log(JSON.stringify(error));
@@ -590,6 +633,15 @@ async function loadReplayLogger() {
   }
 }
 
+function reCreateAiWorker() {
+  try {
+    aiWorker.terminate();
+    aiWorker = new Worker("./modules/AiWorker.js", { type: "module" });
+  } catch (error) {
+    console.error(error.message);
+  }
+}
+
 /**
  * This function:
  * - Initially loads all game id index keys from the ReplayLogger object store
@@ -606,6 +658,24 @@ async function loadReplayLogger() {
 async function initReplayLoggerEventHandlers() {
   try {
     const domReplayLogger = document.getElementById("sectReplayLogger");
+    const gameReplayScrollContainer = domReplayLogger.querySelector(
+      ".navbarUploadModal .dialogUploadModal main"
+    );
+    if (!gameReplayScrollContainer) {
+      throw new Error("cannot relocate scroll container for dialog element");
+    }
+    const dialogConfirmContainer = domReplayLogger.querySelector(
+      ".dialogReplayCommit .dialogConfirmContainer"
+    );
+    if (!dialogConfirmContainer) {
+      throw new Error(
+        "cannot relocate container element for replay commit confirmation"
+      );
+    }
+    dialogConfirmContainer.addEventListener(
+      "click",
+      dialogReplayCommitEventHandler
+    );
     domReplayLogger.addEventListener("click", async (event) => {
       try {
         const icon = event.target.closest("svg");
@@ -634,32 +704,51 @@ async function initReplayLoggerEventHandlers() {
           dialogForGameSelection.showModal();
         }
         if (gridItem.classList.contains("navbarReplayCommit")) {
-          const dialogForReplayCommit = gridItem.querySelector(
+          const dialogReplayCommit = gridItem.querySelector(
             ".dialogReplayCommit"
           );
-          if (!dialogForReplayCommit) {
+          if (!dialogReplayCommit) {
             throw new Error("cannot relocate dialog element");
           }
-          dialogForReplayCommit.showModal();
+          const iconCancel = dialogReplayCommit.querySelector(".iconCancel");
+          const lastBotMove = Number(
+            dialogReplayCommit
+              .querySelector(".dialogConfirmContainer")
+              .getAttribute("data-last-bot-move")
+          );
+          if (isNaN(lastBotMove) || !iconCancel) {
+            throw new Error(
+              "cannot relocate last bot move attribute or cancel icon"
+            );
+          }
+          const dialogConfirmCaption = dialogConfirmContainer.querySelector(
+            ".dialogConfirmCaption p"
+          );
+          if (!dialogConfirmCaption) {
+            throw new Error(
+              "cannot relocate caption element for replay commit dialog"
+            );
+          }
+          if (isNaN(lastBotMove) || lastBotMove < 1) {
+            iconCancel.classList.add("svgHide");
+            dialogConfirmCaption.textContent =
+              "No game history for replay selected!";
+          } else {
+            iconCancel.classList.remove("svgHide");
+            dialogConfirmCaption.textContent = `Replay after bot move #${String(
+              lastBotMove
+            )} ?`;
+          }
+          dialogReplayCommit.showModal();
         }
       } catch (error) {
         console.error(error.message);
       }
     });
-    const gameReplayScrollContainer = document.querySelector(
-      "#sectReplayLogger .navbarUploadModal .dialogUploadModal main"
-    );
-    if (!gameReplayScrollContainer) {
-      throw new Error("cannot relocate scroll container for dialog element");
-    }
     gameReplayScrollContainer.addEventListener(
       "click",
       dialogSelectBtnEventHandler
     );
-    const replayCommitPanel = document.querySelector(
-      "#sectReplayLogger .navbarReplayCommit .dialogReplayCommit"
-    );
-    replayCommitPanel.addEventListener("click", dialogCommitBtnEventHandler);
   } catch (error) {
     console.error(error.message);
   }
@@ -741,13 +830,7 @@ window.addEventListener("load", async () => {
     initSettingsEventHandlers(settings);
     await loadReplayLogger();
     initReplayLoggerEventHandlers();
-    initBoardEventHandlers(
-      domBoard,
-      domBoardState,
-      aiWorker,
-      settings,
-      loggerWriter
-    );
+    initBoardEventHandlers(domBoard, domBoardState, settings, loggerWriter);
     initNavbarEventHandlers(domBoardState, loggerWriter, navbar);
   } catch (error) {
     console.error(error);
@@ -774,3 +857,5 @@ window.addEventListener("unhandledrejection", (event) => {
   console.error(event.promise);
   throw new Error("Promise rejection event, target: " + event.target);
 });
+
+export { reCreateAiWorker };

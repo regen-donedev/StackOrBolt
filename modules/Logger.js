@@ -483,16 +483,17 @@ class LoggerReader {
 
   updateScrollItemElements() {
     this._scrollItem.setAttribute("data-db-key", String(this._gameId));
-    this._scrollItem.querySelector(".headerCaption").innerText =
-      "view and replay this game history";
     const startDate = new Date(this._gameId);
-    this._scrollItem.querySelector(".gameStarted").innerText =
-      "started: " + startDate.toISOString();
-    this._scrollItem.querySelector(".totalMoves").innerText =
-      "total moves: " + String(this._move);
-    this._scrollItem.querySelector(".winnerIs").innerText =
-      "winner: " + this._winner;
-    this._scrollItem.querySelector(".selectGameId").innerHTML = "select";
+    this._scrollItem.querySelector(".panelGameStarted").innerText =
+      startDate.toISOString();
+    this._scrollItem.querySelector(".panelTotalMoves").innerText = String(
+      this._move
+    );
+    this._scrollItem.querySelector(".panelGameWinner").innerText = this._winner;
+    const itemGameFinished =
+      this._scrollItem.querySelector(".panelGameFinished");
+    itemGameFinished.innerText =
+      this._winner === "none" ? "ongoing" : "finished";
   }
 
   addPrimaryKey(key) {

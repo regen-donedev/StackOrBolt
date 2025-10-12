@@ -390,7 +390,7 @@ class Settings {
   /**
    * Restore the Settings object store to the factory default in the database
    * and update all properties of this instance.
-   * @returns {void}
+   * @returns {Promise<void>}
    */
   async restoreFactoryDefault() {
     try {
@@ -453,7 +453,7 @@ class Settings {
 
   /**
    * Perists the customized properties in the database
-   * @returns {void}
+   * @returns {Promise<void>}
    */
   async save() {
     try {
