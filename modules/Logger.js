@@ -292,6 +292,20 @@ class LoggerReader {
   _scrollItem;
 
   /**
+   * controls if the auto play mode is active or not.
+   * @private
+   * @type {Boolean}
+   */
+  _autoPlayActive;
+
+  /**
+   * Helper EventTarget instance to dispatch an event on auto play termination.
+   * @private
+   * @type {EventTarget | null}
+   */
+  _eventTarget;
+
+  /**
    * @static
    * @type {Map<Number, LoggerReader>}
    */
@@ -334,6 +348,8 @@ class LoggerReader {
     this._generator = this.generatorFactory();
     this._winner = "none";
     this._move = 0;
+    this._autoPlayActive = false;
+    this._eventTarget = null;
     const fragment = LoggerReader.scrollItemTemplate.content.cloneNode(true);
     LoggerReader.scrollContainer.appendChild(fragment);
     this._scrollItem = Array.from(LoggerReader.scrollContainer.children).at(-1);
@@ -421,6 +437,46 @@ class LoggerReader {
    */
   set move(value) {
     this._move = value;
+  }
+
+  /**
+   * Gets the flag to control auto play mode.
+   * @public
+   * @type {Boolean}
+   * @returns {Boolean}
+   * @readonly
+   */
+  get autoPlayActive() {
+    return this._autoPlayActive;
+  }
+
+  /**
+   * Sets the flag to control auto play mode.
+   * @public
+   * @param {Boolean} value
+   */
+  set autoPlayActive(value) {
+    this._autoPlayActive = value;
+  }
+
+  /**
+   * Gets the EventTarget property.
+   * @public
+   * @type {EventTarget | null}
+   * @returns {EventTarget | null}
+   * @readonly
+   */
+  get eventTarget() {
+    return this._eventTarget;
+  }
+
+  /**
+   * Sets the EventTarget property.
+   * @public
+   * @param {EventTarget | null} value
+   */
+  set eventTarget(value) {
+    this._eventTarget = value;
   }
 
   /**

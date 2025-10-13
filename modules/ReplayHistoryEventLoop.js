@@ -10,6 +10,11 @@ import { handleErrorEvent } from "./ErrorUtils.js";
 import { LoggerWriter, LoggerReader } from "./Logger.js";
 import { PLAYER_ID, BoardState, Sidebar } from "./GameState.js";
 import { resetGame } from "./GameEventLoop.js";
+import { autoPlayTerminated } from "./AsyncAPIWrapper.js";
+
+const AUTOPLAY_SETTINGS = Object.freeze({
+  TIMEOUT: 2000,
+});
 
 async function loadGameHistoryMove(advanceSteps) {
   if (
@@ -53,6 +58,51 @@ async function loadGameHistoryMove(advanceSteps) {
   prettifyMoveNumber(record.move);
   refreshSidebars(record.boardState._playerState);
   updateLastBotMove(record.move, record.boardState._playerState);
+}
+
+async function waitForNextAutoPlay(timeout = AUTOPLAY_SETTINGS.TIMEOUT) {
+  return new Promise((resolve, _) => {
+    setTimeout(() => {
+      resolve();
+    }, timeout);
+  });
+}
+
+async function autoPlayLongRunning(reader) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      while (true) {
+        await loadGameHistoryMove(1);
+        if (reader.autoPlayActive === false) {
+          break;
+        }
+        await waitForNextAutoPlay();
+      }
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+async function autoPlayManager() {
+  const reader = LoggerReader.currentSelectedInstance;
+  if (
+    !reader ||
+    reader.autoPlayActive === true ||
+    reader.eventTarget !== null
+  ) {
+    throw new Error(
+      "Unable to select LoggerReader instance for game auto play"
+    );
+  }
+  reader.autoPlayActive = true;
+  await autoPlayLongRunning(reader);
+  reader.eventTarget.dispatchEvent(new Event("autoplayterminate"));
+}
+
+async function autoPlayTerminate() {
+  await autoPlayTerminated(LoggerReader.currentSelectedInstance);
 }
 
 function updateSvg(domEl, svgLayout, dot) {
@@ -258,6 +308,8 @@ async function dialogReplayCommitEventHandler(event) {
 
 export {
   loadGameHistoryMove,
+  autoPlayTerminate,
+  autoPlayManager,
   updateSvg,
   dialogSelectBtnEventHandler,
   dialogReplayCommitEventHandler,

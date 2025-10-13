@@ -30,7 +30,6 @@ import {
 } from "./modules/AsyncAPIWrapper.js";
 import { Settings } from "./modules/ConfigState.js";
 import {
-  enableBoardEvents,
   handleHoveredCellIn,
   handleHoveredCellOut,
   prepareMoveForCell,
@@ -46,6 +45,8 @@ import {
 } from "./modules/Logger.js";
 import {
   loadGameHistoryMove,
+  autoPlayTerminate,
+  autoPlayManager,
   updateSvg,
   dialogSelectBtnEventHandler,
   dialogReplayCommitEventHandler,
@@ -695,6 +696,22 @@ async function initReplayLoggerEventHandlers() {
       }
       if (gridItem.classList.contains("footerReplayForwardFast")) {
         await loadGameHistoryMove(Infinity);
+      }
+      if (gridItem.classList.contains("footerReplayPlayPause")) {
+        const iconPlay = gridItem.querySelector(".iconPlay");
+        const iconPause = gridItem.querySelector(".iconPause");
+        if (!iconPlay || !iconPause) {
+          throw new Error("cannot relocate play or pause icon");
+        }
+        if (iconPlay.classList.contains("svgHide")) {
+          iconPlay.classList.remove("svgHide");
+          iconPause.classList.add("svgHide");
+          await autoPlayTerminate();
+        } else {
+          iconPlay.classList.add("svgHide");
+          iconPause.classList.remove("svgHide");
+          await autoPlayManager();
+        }
       }
       if (gridItem.classList.contains("navbarUploadModal")) {
         const dialogForGameSelection =

@@ -149,10 +149,33 @@ async function cssTransitionEnded(
   return Promise.race([cssTransitionPromise, timeoutPromise]);
 }
 
+async function autoPlayTerminated(reader) {
+  return new Promise((resolve, reject) => {
+    try {
+      reader.eventTarget = new EventTarget();
+      const target = reader.eventTarget;
+      const autoPlayTermEventHandler = function (event) {
+        try {
+          target.removeEventListener(event.type, autoPlayTermEventHandler);
+          reader.eventTarget = null;
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      };
+      target.addEventListener("autoplayterminate", autoPlayTermEventHandler);
+      reader.autoPlayActive = false;
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 export {
   dispatchWorker,
   workerMessageScheme,
   cssTransitionEnded,
   messageSchemeComparator,
   handleResponse,
+  autoPlayTerminated,
 };
