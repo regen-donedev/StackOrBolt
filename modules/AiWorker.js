@@ -8,11 +8,12 @@
  * items of the settings section.
  * Whenever a new worker task is dispatched, the current settings are cached and
  * immediately taken into account.
- *
- * @requires module:MinimaxAB
  * @requires module:GameState
+ * @requires module:MinimaxAB
+ * @requires module:AsyncAPIWrapper
+ * @requires module:ErrorUtils
  */
-
+import { handleErrorEvent } from "./ErrorUtils.js";
 import { BoardState } from "./GameState.js";
 import { findBestMove } from "./MinimaxAB.js";
 import { workerMessageScheme } from "./AsyncAPIWrapper.js";
@@ -33,14 +34,15 @@ self.addEventListener("message", (event) => {
       throw new Error("Invalid request  type for AiWorker");
     }
   } catch (error) {
-    console.log(error);
     const errorResponse = structuredClone(workerMessageScheme);
     errorResponse.response.error = true;
-    errorResponse.response.message = "Caught error in ai worker: " + error;
+    errorResponse.response.message =
+      "Caught error in ai worker: " + handleErrorEvent(error);
     self.postMessage(errorResponse);
   }
 });
 
 self.addEventListener("error", (event) => {
-  console.log(error);
+  handleErrorEvent(error);
+  handleErrorEvent(new Error("Uncaught error in AiWorker"));
 });

@@ -4,18 +4,13 @@
  * including legal move topology, move execution, game state updates,
  * player turn switching, move validation, and win condition checks.
  * @requires module:GameState
- * @requires module:GameState~PlayerState
- * @requires module:GameState~BoardState
- * @requires module:GameState~GridCell
- * @requires module:GameState~Player
- * @requires module:GameState.PLAYER_ID
+ * @requires module:ConfigState
  * @exports playMove
  * @exports getLocalMoves
  * @exports getAllPossibleMoves
  * @exports checkWin
  * @exports switchPlayer
  */
-
 import {
   PLAYER_ID,
   GridCell,
@@ -23,7 +18,7 @@ import {
   Player,
   PlayerState,
 } from "./GameState.js";
-
+import { Settings } from "./ConfigState.js";
 /**
  * Update all game state related properties for the source and target GridCell instances,
  * resulting from this move. The target GridCell is either empty
@@ -178,35 +173,31 @@ function getAllPossibleMoves(boardState, player) {
  * @returns {void}
  */
 function stackTowers(srcCell, tgtCell, player, maxStackSize) {
-  try {
-    if (srcCell.svgLayout.length === 0) {
-      throw new Error("source cell has no tower");
-    }
-    if (tgtCell.svgLayout.length === 0) {
-      tgtCell.svgLayout = [...srcCell.svgLayout];
-      return;
-    }
-    if (srcCell.svgLayout.at(-1) !== tgtCell.svgLayout.at(-1)) {
-      for (let i = 0, len = srcCell.svgLayout.length; i < len; i++) {
-        tgtCell.svgLayout.push(srcCell.svgLayout[i]);
-        if (tgtCell.svgLayout.length > maxStackSize) {
-          let selfVal = player.vault.self;
-          let opponentVal = player.vault.opponent;
-          if (tgtCell.svgLayout.at(0) === player.id) {
-            selfVal += 1;
-          } else {
-            opponentVal += 1;
-          }
-          player.vault = { self: selfVal, opponent: opponentVal };
-          tgtCell.svgLayout.shift();
+  if (srcCell.svgLayout.length === 0) {
+    throw new Error("source cell has no tower");
+  }
+  if (tgtCell.svgLayout.length === 0) {
+    tgtCell.svgLayout = [...srcCell.svgLayout];
+    return;
+  }
+  if (srcCell.svgLayout.at(-1) !== tgtCell.svgLayout.at(-1)) {
+    for (let i = 0, len = srcCell.svgLayout.length; i < len; i++) {
+      tgtCell.svgLayout.push(srcCell.svgLayout[i]);
+      if (tgtCell.svgLayout.length > maxStackSize) {
+        let selfVal = player.vault.self;
+        let opponentVal = player.vault.opponent;
+        if (tgtCell.svgLayout.at(0) === player.id) {
+          selfVal += 1;
+        } else {
+          opponentVal += 1;
         }
+        player.vault = { self: selfVal, opponent: opponentVal };
+        tgtCell.svgLayout.shift();
       }
-      return;
-    } else {
-      throw new Error("cannot stack towers of the same player");
     }
-  } catch (error) {
-    console.error(error.message);
+    return;
+  } else {
+    throw new Error("cannot stack towers of the same player");
   }
 }
 
@@ -232,7 +223,7 @@ function switchPlayer(playerState) {
  *
  * @param {BoardState} boardState - The current state of the game board.
  * @param {Player} player - The player object for whom to check the win condition.
- * @param {Settings} settings - The current saved configuration.
+ * @param {Settings | Object} settings - The current saved configuration.
  * @returns {boolean} True if the player has won, otherwise false.
  */
 function checkWin(boardState, player, settings) {
@@ -251,14 +242,15 @@ function checkWin(boardState, player, settings) {
   const opponentTower = boardState.cells.find(
     (cell) => cell.svgLayout.at(-1) === opponent.id
   );
-  if (!opponentTower || opponentTower === null) {
-    player.winner = true;
-    return true;
-  }
   const owningTower = boardState.cells.find(
     (cell) => cell.svgLayout.at(-1) === player.id
   );
-  if (!owningTower || owningTower === null) {
+  opponentTower ??= null;
+  owningTower ??= null;
+  if (
+    player.turn === false &&
+    (opponentTower === null || owningTower === null)
+  ) {
     player.winner = true;
     return true;
   }

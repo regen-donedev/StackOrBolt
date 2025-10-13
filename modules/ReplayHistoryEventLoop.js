@@ -2,139 +2,122 @@
  * @module ReplayhistoryEventLoop
  * @description
  * @requires module:Logger
+ * @requires module:GameState
+ * @requires module:GameEventLoop
+ * @requires module:ErrorUtils
  */
-
+import { handleErrorEvent } from "./ErrorUtils.js";
 import { LoggerWriter, LoggerReader } from "./Logger.js";
 import { PLAYER_ID, BoardState, Sidebar } from "./GameState.js";
 import { resetGame } from "./GameEventLoop.js";
 
 async function loadGameHistoryMove(advanceSteps) {
-  try {
-    if (
-      LoggerReader.instances.size === 0 ||
-      !LoggerReader.currentSelectedInstance
-    ) {
-      return;
-    }
-    const loggerReader = LoggerReader.currentSelectedInstance;
-    const record = await loggerReader.fetchRecord(advanceSteps);
-    const gridCells = record.boardState._cells;
-    const domChildren = Array.from(LoggerReader.historyBoard.children);
-    domChildren.forEach((domGridItem, index) => {
-      domGridItem.classList.remove("mark", "click");
-      const gridCell = gridCells[index];
-      const svgLayout = gridCell._svgLayout;
-      const hasDot = gridCell._dot;
-      updateSvg(domGridItem, svgLayout, hasDot);
-    });
-    if (record.lastMove) {
-      const moveSrcCell = record.lastMove._srcCell;
-      const moveTgtCell = record.lastMove._tgtCell;
-      const moveSrcDomCell = domChildren.find((cell, index) => {
-        if (index === moveSrcCell._id) {
-          return true;
-        }
-      });
-      const moveTgtDomCell = domChildren.find((cell, index) => {
-        if (index === moveTgtCell._id) {
-          return true;
-        }
-      });
-      moveSrcDomCell.classList.add("mark");
-      moveTgtDomCell.classList.add("click");
-    }
-    if (record.move === 0) {
-      record.boardState._playerState._twoPlayer.forEach((player) => {
-        player._turn = false;
-      });
-    }
-    prettifyMoveNumber(record.move);
-    refreshSidebars(record.boardState._playerState);
-    updateLastBotMove(record.move, record.boardState._playerState);
-  } catch (error) {
-    console.error(error.message);
-    throw new Error(JSON.stringify(structuredClone(error)));
+  if (
+    LoggerReader.instances.size === 0 ||
+    !LoggerReader.currentSelectedInstance
+  ) {
+    return;
   }
+  const loggerReader = LoggerReader.currentSelectedInstance;
+  const record = await loggerReader.fetchRecord(advanceSteps);
+  const gridCells = record.boardState._cells;
+  const domChildren = Array.from(LoggerReader.historyBoard.children);
+  domChildren.forEach((domGridItem, index) => {
+    domGridItem.classList.remove("mark", "click");
+    const gridCell = gridCells[index];
+    const svgLayout = gridCell._svgLayout;
+    const hasDot = gridCell._dot;
+    updateSvg(domGridItem, svgLayout, hasDot);
+  });
+  if (record.lastMove) {
+    const moveSrcCell = record.lastMove._srcCell;
+    const moveTgtCell = record.lastMove._tgtCell;
+    const moveSrcDomCell = domChildren.find((cell, index) => {
+      if (index === moveSrcCell._id) {
+        return true;
+      }
+    });
+    const moveTgtDomCell = domChildren.find((cell, index) => {
+      if (index === moveTgtCell._id) {
+        return true;
+      }
+    });
+    moveSrcDomCell.classList.add("mark");
+    moveTgtDomCell.classList.add("click");
+  }
+  if (record.move === 0) {
+    record.boardState._playerState._twoPlayer.forEach((player) => {
+      player._turn = false;
+    });
+  }
+  prettifyMoveNumber(record.move);
+  refreshSidebars(record.boardState._playerState);
+  updateLastBotMove(record.move, record.boardState._playerState);
 }
 
 function updateSvg(domEl, svgLayout, dot) {
-  try {
-    let svgLayoutString;
-    if (svgLayout.length === 0) {
-      svgLayoutString = "none";
-    } else {
-      svgLayoutString = svgLayout.join("_");
-      if (dot === true) {
-        svgLayoutString += "_dot";
-      }
+  let svgLayoutString;
+  if (svgLayout.length === 0) {
+    svgLayoutString = "none";
+  } else {
+    svgLayoutString = svgLayout.join("_");
+    if (dot === true) {
+      svgLayoutString += "_dot";
     }
-    const svgSymbol = `tower_${svgLayoutString}`;
-    domEl
-      .querySelector("use")
-      .setAttribute("href", `./images/pieces.svg#${svgSymbol}`);
-  } catch (error) {
-    console.error(error.message);
-    throw new Error(JSON.stringify(structuredClone(error)));
   }
+  const svgSymbol = `tower_${svgLayoutString}`;
+  domEl
+    .querySelector("use")
+    .setAttribute("href", `./images/pieces.svg#${svgSymbol}`);
 }
 
 function prettifyMoveNumber(moveNo) {
-  try {
-    const hundreds = Math.floor(moveNo / 100);
-    const tens = Math.floor((moveNo % 100) / 10);
-    const ones = moveNo % 10;
-    document
-      .querySelector(".navbarReplayMoveHundreds > svg > use")
-      .setAttribute("href", `./images/icons.svg#icon_digit_${hundreds}`);
-    document
-      .querySelector(".navbarReplayMoveTens > svg > use")
-      .setAttribute("href", `./images/icons.svg#icon_digit_${tens}`);
-    document
-      .querySelector(".navbarReplayMoveOnes > svg > use")
-      .setAttribute("href", `./images/icons.svg#icon_digit_${ones}`);
-  } catch (error) {
-    console.error(error.message);
-    throw new Error(JSON.stringify(structuredClone(error)));
-  }
+  const hundreds = Math.floor(moveNo / 100);
+  const tens = Math.floor((moveNo % 100) / 10);
+  const ones = moveNo % 10;
+  document
+    .querySelector(".navbarReplayMoveHundreds > svg > use")
+    .setAttribute("href", `./images/icons.svg#icon_digit_${hundreds}`);
+  document
+    .querySelector(".navbarReplayMoveTens > svg > use")
+    .setAttribute("href", `./images/icons.svg#icon_digit_${tens}`);
+  document
+    .querySelector(".navbarReplayMoveOnes > svg > use")
+    .setAttribute("href", `./images/icons.svg#icon_digit_${ones}`);
 }
 
 function refreshSidebars(playerState) {
-  try {
-    const logRecordDataUser = playerState._twoPlayer.find(
-      (player, _) => player._id === PLAYER_ID.USER
-    );
-    const logRecordDataBot = playerState._twoPlayer.find(
-      (player, _) => player._id === PLAYER_ID.BOT
-    );
-    const playerUser = LoggerReader.playerHistoryUser;
-    const playerBot = LoggerReader.playerHistoryBot;
-    playerUser.turn = logRecordDataUser._turn;
-    playerUser.lastHorizontal = logRecordDataUser._lastHorizontal;
-    playerUser.safetyTower = logRecordDataUser._safetyTower;
-    playerUser.vault = logRecordDataUser._vault;
-    playerUser.winner = logRecordDataUser._winner;
-    playerBot.turn = logRecordDataBot._turn;
-    playerBot.lastHorizontal = logRecordDataBot._lastHorizontal;
-    playerBot.safetyTower = logRecordDataBot._safetyTower;
-    playerBot.vault = logRecordDataBot._vault;
-    playerBot.winner = logRecordDataBot._winner;
-    Sidebar.playerMapHistory.get(playerUser).refreshDashboard();
-    Sidebar.playerMapHistory.get(playerBot).refreshDashboard();
-    if (playerUser.turn === false && playerBot.turn === false) {
-      Sidebar.playerMapHistory.get(playerUser).unmarkDashboard();
-      Sidebar.playerMapHistory.get(playerBot).unmarkDashboard();
-    }
-    if (playerUser.turn === false && playerBot.turn === true) {
-      Sidebar.playerMapHistory.get(playerUser).markDashboard();
-      Sidebar.playerMapHistory.get(playerBot).unmarkDashboard();
-    }
-    if (playerUser.turn === true && playerBot.turn === false) {
-      Sidebar.playerMapHistory.get(playerUser).unmarkDashboard();
-      Sidebar.playerMapHistory.get(playerBot).markDashboard();
-    }
-  } catch (error) {
-    console.error(error.message);
-    throw new Error(JSON.stringify(structuredClone(error)));
+  const logRecordDataUser = playerState._twoPlayer.find(
+    (player, _) => player._id === PLAYER_ID.USER
+  );
+  const logRecordDataBot = playerState._twoPlayer.find(
+    (player, _) => player._id === PLAYER_ID.BOT
+  );
+  const playerUser = LoggerReader.playerHistoryUser;
+  const playerBot = LoggerReader.playerHistoryBot;
+  playerUser.turn = logRecordDataUser._turn;
+  playerUser.lastHorizontal = logRecordDataUser._lastHorizontal;
+  playerUser.safetyTower = logRecordDataUser._safetyTower;
+  playerUser.vault = logRecordDataUser._vault;
+  playerUser.winner = logRecordDataUser._winner;
+  playerBot.turn = logRecordDataBot._turn;
+  playerBot.lastHorizontal = logRecordDataBot._lastHorizontal;
+  playerBot.safetyTower = logRecordDataBot._safetyTower;
+  playerBot.vault = logRecordDataBot._vault;
+  playerBot.winner = logRecordDataBot._winner;
+  Sidebar.playerMapHistory.get(playerUser).refreshDashboard();
+  Sidebar.playerMapHistory.get(playerBot).refreshDashboard();
+  if (playerUser.turn === false && playerBot.turn === false) {
+    Sidebar.playerMapHistory.get(playerUser).unmarkDashboard();
+    Sidebar.playerMapHistory.get(playerBot).unmarkDashboard();
+  }
+  if (playerUser.turn === false && playerBot.turn === true) {
+    Sidebar.playerMapHistory.get(playerUser).markDashboard();
+    Sidebar.playerMapHistory.get(playerBot).unmarkDashboard();
+  }
+  if (playerUser.turn === true && playerBot.turn === false) {
+    Sidebar.playerMapHistory.get(playerUser).unmarkDashboard();
+    Sidebar.playerMapHistory.get(playerBot).markDashboard();
   }
 }
 
@@ -158,45 +141,39 @@ function updateLastBotMove(moveNo, playerState) {
 }
 
 function replayToSelectedBoardState(record, domBoardState) {
-  try {
-    const newBoardState = BoardState.createFromStructuredClone(
-      record.boardState
-    );
-    const newPlayerBot = newBoardState.playerState.twoPlayer.find(
-      (player) => player.id === PLAYER_ID.BOT
-    );
-    const newPlayerUser = newBoardState.playerState.twoPlayer.find(
-      (player) => player.id === PLAYER_ID.USER
-    );
-    domBoardState.cells.forEach((cell, index) => {
-      const newCell = newBoardState._cells[index];
-      cell.svgLayout = newCell._svgLayout;
-      cell.direction = newCell._direction;
-      cell.dot = newCell._dot;
-      cell.updateSvg();
-    });
-    domBoardState.playerState.twoPlayer.forEach((player) => {
-      if (player.id === PLAYER_ID.BOT) {
-        player.turn = newPlayerBot.turn;
-        player.lastHorizontal = newPlayerBot.lastHorizontal;
-        player.safetyTower = newPlayerBot.safetyTower;
-        player.vault = newPlayerBot.vault;
-        player.winner = newPlayerBot.winner;
-        Sidebar.playerMap.get(player).unmarkDashboard();
-      }
-      if (player.id === PLAYER_ID.USER) {
-        player.turn = newPlayerUser.turn;
-        player.lastHorizontal = newPlayerUser.lastHorizontal;
-        player.safetyTower = newPlayerUser.safetyTower;
-        player.vault = newPlayerUser.vault;
-        player.winner = newPlayerUser.winner;
-        Sidebar.playerMap.get(player).markDashboard();
-      }
-      Sidebar.playerMap.get(player).refreshDashboard();
-    });
-  } catch (error) {
-    console.error(error.message);
-  }
+  const newBoardState = BoardState.createFromStructuredClone(record.boardState);
+  const newPlayerBot = newBoardState.playerState.twoPlayer.find(
+    (player) => player.id === PLAYER_ID.BOT
+  );
+  const newPlayerUser = newBoardState.playerState.twoPlayer.find(
+    (player) => player.id === PLAYER_ID.USER
+  );
+  domBoardState.cells.forEach((cell, index) => {
+    const newCell = newBoardState._cells[index];
+    cell.svgLayout = newCell._svgLayout;
+    cell.direction = newCell._direction;
+    cell.dot = newCell._dot;
+    cell.updateSvg();
+  });
+  domBoardState.playerState.twoPlayer.forEach((player) => {
+    if (player.id === PLAYER_ID.BOT) {
+      player.turn = newPlayerBot.turn;
+      player.lastHorizontal = newPlayerBot.lastHorizontal;
+      player.safetyTower = newPlayerBot.safetyTower;
+      player.vault = newPlayerBot.vault;
+      player.winner = newPlayerBot.winner;
+      Sidebar.playerMap.get(player).unmarkDashboard();
+    }
+    if (player.id === PLAYER_ID.USER) {
+      player.turn = newPlayerUser.turn;
+      player.lastHorizontal = newPlayerUser.lastHorizontal;
+      player.safetyTower = newPlayerUser.safetyTower;
+      player.vault = newPlayerUser.vault;
+      player.winner = newPlayerUser.winner;
+      Sidebar.playerMap.get(player).markDashboard();
+    }
+    Sidebar.playerMap.get(player).refreshDashboard();
+  });
 }
 
 async function dialogSelectBtnEventHandler(event) {
@@ -232,7 +209,8 @@ async function dialogSelectBtnEventHandler(event) {
     await loadGameHistoryMove(Infinity);
     dialog.close();
   } catch (error) {
-    console.error(error.message);
+    handleErrorEvent(error);
+    throw new Error(error);
   }
 }
 
@@ -273,7 +251,8 @@ async function dialogReplayCommitEventHandler(event) {
     window.location.hash = "#sectHome";
     dialog.close();
   } catch (error) {
-    console.error(error.message);
+    handleErrorEvent(error);
+    throw new Error(error);
   }
 }
 

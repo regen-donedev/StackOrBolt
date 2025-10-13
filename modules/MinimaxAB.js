@@ -7,7 +7,6 @@
  * @requires module:GameLogic
  * @exports findBestMove
  */
-
 import { checkWin, getAllPossibleMoves } from "./GameLogic.js";
 import { BoardState, Move } from "./GameState.js";
 let cachedSettingsState;
@@ -25,133 +24,125 @@ let cachedSettingsState;
  * @returns {number|null}
  */
 function getTerminalNodeState(boardState, depth) {
-  try {
-    const playerBot = boardState.playerState.twoPlayer.find(
-      (player) => player.isMaximizing === true
-    );
-    const playerUser = boardState.playerState.twoPlayer.find(
-      (player) => player.isMaximizing === false
-    );
-    if (checkWin(boardState, playerBot, cachedSettingsState)) {
-      return Infinity;
-    }
-    if (checkWin(boardState, playerUser, cachedSettingsState)) {
-      return -Infinity;
-    }
-    if (depth === Number(cachedSettingsState.searchRules.settings.depth)) {
-      let botTowers = 0;
-      let userTowers = 0;
-      let botTowerSafetyWeight = 0;
-      let userTowerSafetyWeight = 0;
-      let score = 0;
-      boardState.cells.forEach((cell) => {
-        if (cell.svgLayout.at(-1) === playerBot.id) {
-          botTowers++;
-          if (
-            cachedSettingsState.winningRules.settings.safetyZone > 0 &&
-            cell.dot === true
-          ) {
-            const rowDistance = 5 - cell.row;
-            switch (rowDistance) {
-              case 1:
-                botTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance1;
-                break;
-              case 2:
-                botTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance2;
-                break;
-              case 3:
-                botTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance3;
-                break;
-              case 4:
-                botTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance4;
-                break;
-              case 5:
-                botTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance5;
-                break;
-              default:
-                throw new Error(
-                  "Evaluation error for invalid material position"
-                );
-            }
-          }
-        }
-        if (cell.svgLayout.at(-1) === playerUser.id) {
-          userTowers++;
-          if (
-            cachedSettingsState.winningRules.settings.safetyZone > 0 &&
-            cell.dot === true
-          ) {
-            const rowDistance = cell.row;
-            switch (rowDistance) {
-              case 1:
-                userTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance1;
-                break;
-              case 2:
-                userTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance2;
-                break;
-              case 3:
-                userTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance3;
-                break;
-              case 4:
-                userTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance4;
-                break;
-              case 5:
-                userTowerSafetyWeight +=
-                  cachedSettingsState.safetyZoneProximity.settings
-                    .weightRowDistance5;
-                break;
-              default:
-                throw new Error(
-                  "Evaluation error for invalid material position"
-                );
-            }
-          }
-        }
-      });
-      // Increase the heuristic score for Conquered Material Advantage
-      // by applying the final weight for the total difference.
-      score +=
-        (botTowers - userTowers) *
-        cachedSettingsState.materialAdvantageConquered.settings.totalWeight;
-      // Increase the heuristic score for Safety Zone Proximity
-      // by applying the final weight for the total difference.
-      if (cachedSettingsState.winningRules.settings.safetyZone > 0) {
-        score +=
-          (botTowerSafetyWeight - 2 * userTowerSafetyWeight) *
-          cachedSettingsState.safetyZoneProximity.settings.totalWeight;
-      }
-      // Increase the heuristic score for Accounted Material Advantage
-      // by applying the final weight for the total difference.
-      if (cachedSettingsState.winningRules.settings.materialOpponent > 0) {
-        score +=
-          (playerBot.vault.opponent - playerUser.vault.opponent) *
-          cachedSettingsState.materialAdvantageAccounted.settings.totalWeight;
-      }
-
-      return score;
-    }
-    return null;
-  } catch (error) {
-    console.log("Caught error in getTerminalNodeState: " + error);
+  const playerBot = boardState.playerState.twoPlayer.find(
+    (player) => player.isMaximizing === true
+  );
+  const playerUser = boardState.playerState.twoPlayer.find(
+    (player) => player.isMaximizing === false
+  );
+  if (checkWin(boardState, playerBot, cachedSettingsState)) {
+    return Infinity;
   }
+  if (checkWin(boardState, playerUser, cachedSettingsState)) {
+    return -Infinity;
+  }
+  if (depth === Number(cachedSettingsState.searchRules.settings.depth)) {
+    let botTowers = 0;
+    let userTowers = 0;
+    let botTowerSafetyWeight = 0;
+    let userTowerSafetyWeight = 0;
+    let score = 0;
+    boardState.cells.forEach((cell) => {
+      if (cell.svgLayout.at(-1) === playerBot.id) {
+        botTowers++;
+        if (
+          cachedSettingsState.winningRules.settings.safetyZone > 0 &&
+          cell.dot === true
+        ) {
+          const rowDistance = 5 - cell.row;
+          switch (rowDistance) {
+            case 1:
+              botTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance1;
+              break;
+            case 2:
+              botTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance2;
+              break;
+            case 3:
+              botTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance3;
+              break;
+            case 4:
+              botTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance4;
+              break;
+            case 5:
+              botTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance5;
+              break;
+            default:
+              throw new Error("Evaluation error for invalid material position");
+          }
+        }
+      }
+      if (cell.svgLayout.at(-1) === playerUser.id) {
+        userTowers++;
+        if (
+          cachedSettingsState.winningRules.settings.safetyZone > 0 &&
+          cell.dot === true
+        ) {
+          const rowDistance = cell.row;
+          switch (rowDistance) {
+            case 1:
+              userTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance1;
+              break;
+            case 2:
+              userTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance2;
+              break;
+            case 3:
+              userTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance3;
+              break;
+            case 4:
+              userTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance4;
+              break;
+            case 5:
+              userTowerSafetyWeight +=
+                cachedSettingsState.safetyZoneProximity.settings
+                  .weightRowDistance5;
+              break;
+            default:
+              throw new Error("Evaluation error for invalid material position");
+          }
+        }
+      }
+    });
+    // Increase the heuristic score for Conquered Material Advantage
+    // by applying the final weight for the total difference.
+    score +=
+      (botTowers - userTowers) *
+      cachedSettingsState.materialAdvantageConquered.settings.totalWeight;
+    // Increase the heuristic score for Safety Zone Proximity
+    // by applying the final weight for the total difference.
+    if (cachedSettingsState.winningRules.settings.safetyZone > 0) {
+      score +=
+        (botTowerSafetyWeight - 2 * userTowerSafetyWeight) *
+        cachedSettingsState.safetyZoneProximity.settings.totalWeight;
+    }
+    // Increase the heuristic score for Accounted Material Advantage
+    // by applying the final weight for the total difference.
+    if (cachedSettingsState.winningRules.settings.materialOpponent > 0) {
+      score +=
+        (playerBot.vault.opponent - playerUser.vault.opponent) *
+        cachedSettingsState.materialAdvantageAccounted.settings.totalWeight;
+    }
+
+    return score;
+  }
+  return null;
 }
 
 /**
@@ -165,73 +156,69 @@ function getTerminalNodeState(boardState, depth) {
  * @returns {number} The optimal score for the current board state.
  */
 function minimax(boardState, depth, alpha, beta) {
-  try {
-    const currentPlayer = boardState.playerState.twoPlayer.find(
-      (player) => player.turn === true
-    );
-    const evaluation = getTerminalNodeState(boardState, depth);
-    if (evaluation !== null) {
-      return evaluation;
-    }
+  const currentPlayer = boardState.playerState.twoPlayer.find(
+    (player) => player.turn === true
+  );
+  const evaluation = getTerminalNodeState(boardState, depth);
+  if (evaluation !== null) {
+    return evaluation;
+  }
 
-    if (currentPlayer.isMaximizing === true) {
-      let max_eval = -Infinity;
-      const possibleMoves = getAllPossibleMoves(boardState, currentPlayer);
-      for (let i = 0, len = possibleMoves.length; i < len; i++) {
-        let move = possibleMoves[i];
-        let loggedMove = new Move(
-          move[0].cloneInstance(),
-          move[1].cloneInstance(),
-          boardState.playerState.cloneInstance()
-        );
-        boardState.applyMoveAndTurn(
-          move[0],
-          move[1],
-          cachedSettingsState.winningRules.settings.maxStackSize
-        );
-        const evaluate = minimax(boardState, depth + 1, alpha, beta);
-        boardState.undoMove(loggedMove);
-        max_eval = Math.max(max_eval, evaluate);
-        alpha = Math.max(alpha, max_eval);
-        // Alpha-Beta Pruning: If beta is less than or equal to alpha,
-        // it means the minimizing player already has a better option higher up.
-        // So, this branch won't be chosen by the minimizing player.
-        if (beta <= alpha) {
-          break; // Prune the remaining branches
-        }
+  if (currentPlayer.isMaximizing === true) {
+    let max_eval = -Infinity;
+    const possibleMoves = getAllPossibleMoves(boardState, currentPlayer);
+    for (let i = 0, len = possibleMoves.length; i < len; i++) {
+      let move = possibleMoves[i];
+      let loggedMove = new Move(
+        move[0].cloneInstance(),
+        move[1].cloneInstance(),
+        boardState.playerState.cloneInstance()
+      );
+      boardState.applyMoveAndTurn(
+        move[0],
+        move[1],
+        cachedSettingsState.winningRules.settings.maxStackSize
+      );
+      const evaluate = minimax(boardState, depth + 1, alpha, beta);
+      boardState.undoMove(loggedMove);
+      max_eval = Math.max(max_eval, evaluate);
+      alpha = Math.max(alpha, max_eval);
+      // Alpha-Beta Pruning: If beta is less than or equal to alpha,
+      // it means the minimizing player already has a better option higher up.
+      // So, this branch won't be chosen by the minimizing player.
+      if (beta <= alpha) {
+        break; // Prune the remaining branches
       }
-      return max_eval;
-    } else {
-      // Minimizing player
-      let min_eval = Infinity;
-      const possibleMoves = getAllPossibleMoves(boardState, currentPlayer);
-      for (let i = 0, len = possibleMoves.length; i < len; i++) {
-        let move = possibleMoves[i];
-        let loggedMove = new Move(
-          move[0].cloneInstance(),
-          move[1].cloneInstance(),
-          boardState.playerState.cloneInstance()
-        );
-        boardState.applyMoveAndTurn(
-          move[0],
-          move[1],
-          cachedSettingsState.winningRules.settings.maxStackSize
-        );
-        const evaluate = minimax(boardState, depth + 1, alpha, beta);
-        boardState.undoMove(loggedMove);
-        min_eval = Math.min(min_eval, evaluate);
-        beta = Math.min(beta, min_eval); // Update beta
-        // Alpha-Beta Pruning: If beta is less than or equal to alpha,
-        // it means the maximizing player already has a better option higher up.
-        // So, this branch won't be reached by the maximizing player.
-        if (beta <= alpha) {
-          break; // Prune the remaining branches
-        }
-      }
-      return min_eval;
     }
-  } catch (error) {
-    console.log("caught error in minimax: " + error);
+    return max_eval;
+  } else {
+    // Minimizing player
+    let min_eval = Infinity;
+    const possibleMoves = getAllPossibleMoves(boardState, currentPlayer);
+    for (let i = 0, len = possibleMoves.length; i < len; i++) {
+      let move = possibleMoves[i];
+      let loggedMove = new Move(
+        move[0].cloneInstance(),
+        move[1].cloneInstance(),
+        boardState.playerState.cloneInstance()
+      );
+      boardState.applyMoveAndTurn(
+        move[0],
+        move[1],
+        cachedSettingsState.winningRules.settings.maxStackSize
+      );
+      const evaluate = minimax(boardState, depth + 1, alpha, beta);
+      boardState.undoMove(loggedMove);
+      min_eval = Math.min(min_eval, evaluate);
+      beta = Math.min(beta, min_eval); // Update beta
+      // Alpha-Beta Pruning: If beta is less than or equal to alpha,
+      // it means the maximizing player already has a better option higher up.
+      // So, this branch won't be reached by the maximizing player.
+      if (beta <= alpha) {
+        break; // Prune the remaining branches
+      }
+    }
+    return min_eval;
   }
 }
 
@@ -242,56 +229,42 @@ function minimax(boardState, depth, alpha, beta) {
  * @returns {GridCell[]} The source and target coordinates for the best move, or null if no moves are possible.
  */
 function findBestMove(boardState, settings) {
-  try {
-    cachedSettingsState = structuredClone(settings);
-    const player = boardState.playerState.twoPlayer.find(
-      (player) => player.turn === true
+  cachedSettingsState = structuredClone(settings);
+  const player = boardState.playerState.twoPlayer.find(
+    (player) => player.turn === true
+  );
+  if (player.isMaximizing === false) {
+    throw new Error(
+      "findBestMove must be invoked for the bot AI opponent (maximizing player)."
     );
-    if (player.isMaximizing === false) {
-      throw new Error(
-        "findBestMove must be invoked for the bot AI opponent (maximizing player)."
-      );
-    }
-    let best_score = -Infinity;
-    let best_move = null;
-    const possibleMoves = getAllPossibleMoves(boardState, player);
-    if (possibleMoves.length === 0) {
-      throw new Error("could not determine possible moves");
-    }
-    // Initial call to minimax with alpha = -Infinity and beta = +Infinity
-    for (let i = 0, len = possibleMoves.length; i < len; i++) {
-      const move = possibleMoves[i];
-      const loggedMove = new Move(
-        move[0].cloneInstance(),
-        move[1].cloneInstance(),
-        boardState.playerState.cloneInstance()
-      );
-      boardState.applyMoveAndTurn(
-        move[0],
-        move[1],
-        cachedSettingsState.winningRules.settings.maxStackSize
-      );
-      let score_for_this_move = minimax(boardState, 0, -Infinity, Infinity);
-      console.log(
-        "findBestMove " +
-          String(i) +
-          "#srcCell " +
-          move[0].id +
-          " tgtCell " +
-          move[1].id +
-          " score: " +
-          score_for_this_move
-      );
-      boardState.undoMove(loggedMove);
-      if (score_for_this_move > best_score) {
-        best_score = score_for_this_move;
-        best_move = move;
-      }
-    }
-    return best_move === null ? possibleMoves[0] : best_move;
-  } catch (error) {
-    console.log("Error in findBestMove: " + error.toString());
   }
+  let best_score = -Infinity;
+  let best_move = null;
+  const possibleMoves = getAllPossibleMoves(boardState, player);
+  if (possibleMoves.length === 0) {
+    throw new Error("could not determine possible moves");
+  }
+  // Initial call to minimax with alpha = -Infinity and beta = +Infinity
+  for (let i = 0, len = possibleMoves.length; i < len; i++) {
+    const move = possibleMoves[i];
+    const loggedMove = new Move(
+      move[0].cloneInstance(),
+      move[1].cloneInstance(),
+      boardState.playerState.cloneInstance()
+    );
+    boardState.applyMoveAndTurn(
+      move[0],
+      move[1],
+      cachedSettingsState.winningRules.settings.maxStackSize
+    );
+    let score_for_this_move = minimax(boardState, 0, -Infinity, Infinity);
+    boardState.undoMove(loggedMove);
+    if (score_for_this_move > best_score) {
+      best_score = score_for_this_move;
+      best_move = move;
+    }
+  }
+  return best_move === null ? possibleMoves[0] : best_move;
 }
 
 export { findBestMove };

@@ -8,11 +8,14 @@
  * the GameLogic for core game rules and moves,
  * and the MinimaxAB module for AI decision-making.
  * @requires module:GameState
- * @requires module:GameLogic
- * @requires module:MinimaxAB
  * @requires module:AsyncAPIWrapper
  * @requires module:ConfigState
+ * @requires module:GameEventLoop
+ * @requires module:Logger
+ * @requires module:ReplayHistoryEventLoop
+ * @requires module:ErrorUtils
  */
+import { handleErrorEvent } from "./modules/ErrorUtils.js";
 import {
   GridCell,
   BoardState,
@@ -218,7 +221,7 @@ function initBoardEventHandlers(
       }
       handleHoveredCellIn(hoveredCell, domBoardState, currentPlayer);
     } catch (error) {
-      console.error(error);
+      handleErrorEvent(error);
       throw new Error(error);
     }
   });
@@ -246,7 +249,7 @@ function initBoardEventHandlers(
       }
       handleHoveredCellOut();
     } catch (error) {
-      console.error(error);
+      handleErrorEvent(error);
       throw new Error(error);
     }
   });
@@ -279,7 +282,7 @@ function initBoardEventHandlers(
         clickedCell
       );
     } catch (error) {
-      console.error(error);
+      handleErrorEvent(error);
       throw new Error(error);
     }
   });
@@ -333,7 +336,7 @@ function initNavbarEventHandlers(domBoardState, loggerWriter, navbar) {
         }
       }
     } catch (error) {
-      console.error(error);
+      handleErrorEvent(error);
       throw new Error(error);
     }
   });
@@ -346,80 +349,66 @@ function initNavbarEventHandlers(domBoardState, loggerWriter, navbar) {
  * @returns {void}
  */
 function initRangeSlidersFromDb(settings, inputs, outputs) {
-  try {
-    inputs.forEach((input, index) => {
-      switch (input.id) {
-        case "safetyTowers":
-          input.value = String(settings.winningRules.settings.safetyZone);
-          break;
-        case "opponentStones":
-          input.value = String(settings.winningRules.settings.materialOpponent);
-          break;
-        case "maxStackSize":
-          input.value = String(settings.winningRules.settings.maxStackSize);
-          break;
-        case "searchDepth":
-          input.value = String(settings.searchRules.settings.depth);
-          break;
-        case "searchTimeout":
-          input.value = String(settings.searchRules.settings.timeout);
-          break;
-        case "materialAdvantageConquered":
-          input.value = String(
-            settings.materialAdvantageConquered.settings.totalWeight
-          );
-          break;
-        case "safetyZone1":
-          input.value = String(
-            settings.safetyZoneProximity.settings.weightRowDistance1
-          );
-          break;
-        case "safetyZone2":
-          input.value = String(
-            settings.safetyZoneProximity.settings.weightRowDistance2
-          );
-          break;
-        case "safetyZone3":
-          input.value = String(
-            settings.safetyZoneProximity.settings.weightRowDistance3
-          );
-          break;
-        case "safetyZone4":
-          input.value = String(
-            settings.safetyZoneProximity.settings.weightRowDistance4
-          );
-          break;
-        case "safetyZone5":
-          input.value = String(
-            settings.safetyZoneProximity.settings.weightRowDistance5
-          );
-          break;
-        case "safetyZoneTotalWeight":
-          input.value = String(
-            settings.safetyZoneProximity.settings.totalWeight
-          );
-          break;
-        case "materialAdvantageAccounted":
-          input.value = String(
-            settings.materialAdvantageAccounted.settings.totalWeight
-          );
-          break;
-        default:
-          throw new Error("unknown input element");
-      }
-      outputs.at(index).textContent = input.value;
-    });
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-async function loadSettings(settings) {
-  try {
-    await settings.load();
-  } catch (error) {
-    throw new Error(JSON.stringify(error));
-  }
+  inputs.forEach((input, index) => {
+    switch (input.id) {
+      case "safetyTowers":
+        input.value = String(settings.winningRules.settings.safetyZone);
+        break;
+      case "opponentStones":
+        input.value = String(settings.winningRules.settings.materialOpponent);
+        break;
+      case "maxStackSize":
+        input.value = String(settings.winningRules.settings.maxStackSize);
+        break;
+      case "searchDepth":
+        input.value = String(settings.searchRules.settings.depth);
+        break;
+      case "searchTimeout":
+        input.value = String(settings.searchRules.settings.timeout);
+        break;
+      case "materialAdvantageConquered":
+        input.value = String(
+          settings.materialAdvantageConquered.settings.totalWeight
+        );
+        break;
+      case "safetyZone1":
+        input.value = String(
+          settings.safetyZoneProximity.settings.weightRowDistance1
+        );
+        break;
+      case "safetyZone2":
+        input.value = String(
+          settings.safetyZoneProximity.settings.weightRowDistance2
+        );
+        break;
+      case "safetyZone3":
+        input.value = String(
+          settings.safetyZoneProximity.settings.weightRowDistance3
+        );
+        break;
+      case "safetyZone4":
+        input.value = String(
+          settings.safetyZoneProximity.settings.weightRowDistance4
+        );
+        break;
+      case "safetyZone5":
+        input.value = String(
+          settings.safetyZoneProximity.settings.weightRowDistance5
+        );
+        break;
+      case "safetyZoneTotalWeight":
+        input.value = String(settings.safetyZoneProximity.settings.totalWeight);
+        break;
+      case "materialAdvantageAccounted":
+        input.value = String(
+          settings.materialAdvantageAccounted.settings.totalWeight
+        );
+        break;
+      default:
+        throw new Error("unknown input element");
+    }
+    outputs.at(index).textContent = input.value;
+  });
 }
 
 async function saveCurrentSettings(domInputs, dbSettings) {
@@ -529,40 +518,59 @@ function initSettingsEventHandlers(settings) {
   initRangeSlidersFromDb(settings, inputs, outputs);
   dialogSaveCancel.addEventListener("click", (event) => {
     try {
+      if (isFatalError) {
+        return;
+      }
       dialogSave.close();
     } catch (error) {
-      console.log(error.message);
+      handleErrorEvent(error);
+      throw new Error(error);
     }
   });
   dialogSaveConfirm.addEventListener("click", async (event) => {
     try {
+      if (isFatalError) {
+        return;
+      }
       await saveCurrentSettings(
         Array.from(domSettings.getElementsByTagName("input")),
         settings
       );
       dialogSave.close();
     } catch (error) {
-      console.log(error.message);
+      handleErrorEvent(error);
+      throw new Error(error);
     }
   });
   dialogRecycleCancel.addEventListener("click", (event) => {
     try {
+      if (isFatalError) {
+        return;
+      }
       dialogRecycle.close();
     } catch (error) {
-      console.log(error.message);
+      handleErrorEvent(error);
+      throw new Error(error);
     }
   });
   dialogRecycleConfirm.addEventListener("click", async (event) => {
     try {
+      if (isFatalError) {
+        return;
+      }
       await settings.restoreFactoryDefault();
       initRangeSlidersFromDb(settings, inputs, outputs);
       dialogRecycle.close();
     } catch (error) {
-      console.log(error.message);
+      handleErrorEvent(error);
+      throw new Error(error);
     }
   });
   domSettings.addEventListener("input", (event) => {
     try {
+      if (isFatalError) {
+        return;
+      }
       const form = event.target.closest(".panel");
       const inputs = Array.from(form.getElementsByTagName("input"));
       const outputs = Array.from(form.getElementsByTagName("output"));
@@ -570,12 +578,15 @@ function initSettingsEventHandlers(settings) {
         outputs.at(index).textContent = input.value;
       });
     } catch (error) {
-      console.log(JSON.stringify(error));
-      throw new Error(JSON.stringify(error));
+      handleErrorEvent(error);
+      throw new Error(error);
     }
   });
   domSettings.addEventListener("click", async (event) => {
     try {
+      if (isFatalError) {
+        return;
+      }
       const navIcon = event.target.closest("svg");
       if (
         !navIcon ||
@@ -593,53 +604,44 @@ function initSettingsEventHandlers(settings) {
         return;
       }
     } catch (error) {
-      console.log(JSON.stringify(error));
-      throw new Error(JSON.stringify(error));
+      handleErrorEvent(error);
+      throw new Error(error);
     }
   });
 }
 
 async function loadReplayLogger() {
-  try {
-    const allIndexKeys = await cacheAllIndexKeys();
-    if (allIndexKeys) {
-      for (const gameId of allIndexKeys) {
-        const reader = new LoggerReader(gameId);
-        const keys = await cacheKeysFromIndex(gameId);
-        keys.forEach((key, _) => {
-          reader.addPrimaryKey(key);
-        });
-        //update scroll container item content for the game history properties
-        const lastLoggedMove = await reader.fetchRecord(Infinity);
-        reader.move = lastLoggedMove.move;
-        const bot = lastLoggedMove.boardState._playerState._twoPlayer.find(
-          (player) => player._id === PLAYER_ID.BOT
-        );
-        const user = lastLoggedMove.boardState._playerState._twoPlayer.find(
-          (player) => player._id === PLAYER_ID.USER
-        );
-        if (bot._winner === true) {
-          reader.winner = PLAYER_ID.BOT;
-        }
-        if (user._winner === true) {
-          reader.winner = PLAYER_ID.USER;
-        }
-        reader.updateScrollItemElements();
+  const allIndexKeys = await cacheAllIndexKeys();
+  if (allIndexKeys) {
+    for (const gameId of allIndexKeys) {
+      const reader = new LoggerReader(gameId);
+      const keys = await cacheKeysFromIndex(gameId);
+      keys.forEach((key, _) => {
+        reader.addPrimaryKey(key);
+      });
+      //update scroll container item content for the game history properties
+      const lastLoggedMove = await reader.fetchRecord(Infinity);
+      reader.move = lastLoggedMove.move;
+      const bot = lastLoggedMove.boardState._playerState._twoPlayer.find(
+        (player) => player._id === PLAYER_ID.BOT
+      );
+      const user = lastLoggedMove.boardState._playerState._twoPlayer.find(
+        (player) => player._id === PLAYER_ID.USER
+      );
+      if (bot._winner === true) {
+        reader.winner = PLAYER_ID.BOT;
       }
+      if (user._winner === true) {
+        reader.winner = PLAYER_ID.USER;
+      }
+      reader.updateScrollItemElements();
     }
-  } catch (error) {
-    console.error(error.message);
-    throw new Error(JSON.stringify(structuredClone(error)));
   }
 }
 
 function reCreateAiWorker() {
-  try {
-    aiWorker.terminate();
-    aiWorker = new Worker("./modules/AiWorker.js", { type: "module" });
-  } catch (error) {
-    console.error(error.message);
-  }
+  aiWorker.terminate();
+  aiWorker = new Worker("./modules/AiWorker.js", { type: "module" });
 }
 
 /**
@@ -656,102 +658,99 @@ function reCreateAiWorker() {
  * @returns {void}
  */
 async function initReplayLoggerEventHandlers() {
-  try {
-    const domReplayLogger = document.getElementById("sectReplayLogger");
-    const gameReplayScrollContainer = domReplayLogger.querySelector(
-      ".navbarUploadModal .dialogUploadModal main"
-    );
-    if (!gameReplayScrollContainer) {
-      throw new Error("cannot relocate scroll container for dialog element");
-    }
-    const dialogConfirmContainer = domReplayLogger.querySelector(
-      ".dialogReplayCommit .dialogConfirmContainer"
-    );
-    if (!dialogConfirmContainer) {
-      throw new Error(
-        "cannot relocate container element for replay commit confirmation"
-      );
-    }
-    dialogConfirmContainer.addEventListener(
-      "click",
-      dialogReplayCommitEventHandler
-    );
-    domReplayLogger.addEventListener("click", async (event) => {
-      try {
-        const icon = event.target.closest("svg");
-        const gridItem = icon.closest("div");
-        if (!icon || !gridItem || !icon.classList.contains("icon2")) {
-          return;
-        }
-        if (gridItem.classList.contains("footerReplayBackwardStep")) {
-          await loadGameHistoryMove(-1);
-        }
-        if (gridItem.classList.contains("footerReplayBackwardFast")) {
-          await loadGameHistoryMove(-Infinity);
-        }
-        if (gridItem.classList.contains("footerReplayForwardStep")) {
-          await loadGameHistoryMove(1);
-        }
-        if (gridItem.classList.contains("footerReplayForwardFast")) {
-          await loadGameHistoryMove(Infinity);
-        }
-        if (gridItem.classList.contains("navbarUploadModal")) {
-          const dialogForGameSelection =
-            gridItem.querySelector(".dialogUploadModal");
-          if (!dialogForGameSelection) {
-            throw new Error("cannot relocate dialog element");
-          }
-          dialogForGameSelection.showModal();
-        }
-        if (gridItem.classList.contains("navbarReplayCommit")) {
-          const dialogReplayCommit = gridItem.querySelector(
-            ".dialogReplayCommit"
-          );
-          if (!dialogReplayCommit) {
-            throw new Error("cannot relocate dialog element");
-          }
-          const iconCancel = dialogReplayCommit.querySelector(".iconCancel");
-          const lastBotMove = Number(
-            dialogReplayCommit
-              .querySelector(".dialogConfirmContainer")
-              .getAttribute("data-last-bot-move")
-          );
-          if (isNaN(lastBotMove) || !iconCancel) {
-            throw new Error(
-              "cannot relocate last bot move attribute or cancel icon"
-            );
-          }
-          const dialogConfirmCaption = dialogConfirmContainer.querySelector(
-            ".dialogConfirmCaption p"
-          );
-          if (!dialogConfirmCaption) {
-            throw new Error(
-              "cannot relocate caption element for replay commit dialog"
-            );
-          }
-          if (isNaN(lastBotMove) || lastBotMove < 1) {
-            iconCancel.classList.add("svgHide");
-            dialogConfirmCaption.textContent =
-              "No game history for replay selected!";
-          } else {
-            iconCancel.classList.remove("svgHide");
-            dialogConfirmCaption.textContent = `Replay after bot move #${String(
-              lastBotMove
-            )} ?`;
-          }
-          dialogReplayCommit.showModal();
-        }
-      } catch (error) {
-        console.error(error.message);
-      }
-    });
-    gameReplayScrollContainer.addEventListener(
-      "click",
-      dialogSelectBtnEventHandler
-    );
-  } catch (error) {
-    console.error(error.message);
+  const domReplayLogger = document.getElementById("sectReplayLogger");
+  const gameReplayScrollContainer = domReplayLogger.querySelector(
+    ".navbarUploadModal .dialogUploadModal main"
+  );
+  if (!gameReplayScrollContainer) {
+    throw new Error("cannot relocate scroll container for dialog element");
   }
+  const dialogConfirmContainer = domReplayLogger.querySelector(
+    ".dialogReplayCommit .dialogConfirmContainer"
+  );
+  if (!dialogConfirmContainer) {
+    throw new Error(
+      "cannot relocate container element for replay commit confirmation"
+    );
+  }
+  dialogConfirmContainer.addEventListener(
+    "click",
+    dialogReplayCommitEventHandler
+  );
+  domReplayLogger.addEventListener("click", async (event) => {
+    try {
+      const icon = event.target.closest("svg");
+      const gridItem = icon.closest("div");
+      if (!icon || !gridItem || !icon.classList.contains("icon2")) {
+        return;
+      }
+      if (gridItem.classList.contains("footerReplayBackwardStep")) {
+        await loadGameHistoryMove(-1);
+      }
+      if (gridItem.classList.contains("footerReplayBackwardFast")) {
+        await loadGameHistoryMove(-Infinity);
+      }
+      if (gridItem.classList.contains("footerReplayForwardStep")) {
+        await loadGameHistoryMove(1);
+      }
+      if (gridItem.classList.contains("footerReplayForwardFast")) {
+        await loadGameHistoryMove(Infinity);
+      }
+      if (gridItem.classList.contains("navbarUploadModal")) {
+        const dialogForGameSelection =
+          gridItem.querySelector(".dialogUploadModal");
+        if (!dialogForGameSelection) {
+          throw new Error("cannot relocate dialog element");
+        }
+        dialogForGameSelection.showModal();
+      }
+      if (gridItem.classList.contains("navbarReplayCommit")) {
+        const dialogReplayCommit = gridItem.querySelector(
+          ".dialogReplayCommit"
+        );
+        if (!dialogReplayCommit) {
+          throw new Error("cannot relocate dialog element");
+        }
+        const iconCancel = dialogReplayCommit.querySelector(".iconCancel");
+        const lastBotMove = Number(
+          dialogReplayCommit
+            .querySelector(".dialogConfirmContainer")
+            .getAttribute("data-last-bot-move")
+        );
+        if (isNaN(lastBotMove) || !iconCancel) {
+          throw new Error(
+            "cannot relocate last bot move attribute or cancel icon"
+          );
+        }
+        const dialogConfirmCaption = dialogConfirmContainer.querySelector(
+          ".dialogConfirmCaption p"
+        );
+        if (!dialogConfirmCaption) {
+          throw new Error(
+            "cannot relocate caption element for replay commit dialog"
+          );
+        }
+        if (isNaN(lastBotMove) || lastBotMove < 1) {
+          iconCancel.classList.add("svgHide");
+          dialogConfirmCaption.textContent =
+            "No game history for replay selected!";
+        } else {
+          iconCancel.classList.remove("svgHide");
+          dialogConfirmCaption.textContent = `Replay after bot move #${String(
+            lastBotMove
+          )} ?`;
+        }
+        dialogReplayCommit.showModal();
+      }
+    } catch (error) {
+      handleErrorEvent(error);
+      throw new Error(error);
+    }
+  });
+  gameReplayScrollContainer.addEventListener(
+    "click",
+    dialogSelectBtnEventHandler
+  );
 }
 
 /**
@@ -826,25 +825,22 @@ window.addEventListener("load", async () => {
     const settings = new Settings(dbWorker);
     const loggerWriter = new LoggerWriter(domBoardState);
     LoggerWriter.currentLiveInstance = loggerWriter;
-    await loadSettings(settings);
+    await settings.load();
     initSettingsEventHandlers(settings);
     await loadReplayLogger();
     initReplayLoggerEventHandlers();
     initBoardEventHandlers(domBoard, domBoardState, settings, loggerWriter);
     initNavbarEventHandlers(domBoardState, loggerWriter, navbar);
   } catch (error) {
-    console.error(error);
+    handleErrorEvent(error);
     throw new Error(error);
   }
 });
 window.addEventListener("error", (errorEvent) => {
   errorEvent.stopImmediatePropagation();
   isFatalError = true;
-  console.error(errorEvent.error);
-  console.error(errorEvent.message);
-  console.error(error.filename);
-  console.error(error.lineno);
-  console.error(errorEvent.colno);
+
+  handleErrorEvent(errorEvent.error || new Error("Unknown error"));
   if (dbWorker && dbWorker instanceof Worker) {
     dbWorker.terminate();
   }
@@ -853,9 +849,11 @@ window.addEventListener("error", (errorEvent) => {
   }
 });
 window.addEventListener("unhandledrejection", (event) => {
-  console.error(event.reason);
-  console.error(event.promise);
-  throw new Error("Promise rejection event, target: " + event.target);
+  const error = event.reason;
+  console.error("--- Unhandled Promise Rejection Detected ---");
+  handleErrorEvent(error);
+  console.error("-------------------------------------------");
+  event.preventDefault();
 });
 
 export { reCreateAiWorker };

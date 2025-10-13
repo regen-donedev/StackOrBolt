@@ -17,7 +17,6 @@
  * @exports Move - Represents a move in the game, including the source cell, target cell, and the player's state.
  * @exports Sidebar - Visualizing each player's state.
  */
-
 import { playMove, switchPlayer } from "./GameLogic.js";
 import { NEW_VAULT } from "./types.js";
 const PLAYER_ID = Object.freeze({
@@ -1238,88 +1237,80 @@ class Sidebar {
    * @throws {Error} - On invalid div child elements.
    */
   constructor(player, container, history) {
-    try {
-      if (
-        !(player instanceof Player) ||
-        !(container instanceof HTMLDivElement)
-      ) {
-        throw new TypeError("invalid parms");
+    if (!(player instanceof Player) || !(container instanceof HTMLDivElement)) {
+      throw new Error("invalid parms");
+    }
+    this._player = player;
+    this._container = container;
+    this._history = history;
+    Array.from(container.children).forEach((divElem) => {
+      if (!(divElem instanceof HTMLDivElement)) {
+        throw new Error("invalid parameter");
       }
-      this._player = player;
-      this._container = container;
-      this._history = history;
-      Array.from(container.children).forEach((divElem) => {
-        if (!(divElem instanceof HTMLDivElement)) {
-          throw new TypeError("invalid parameter");
+      Array.from(divElem.classList).forEach((name) => {
+        switch (name) {
+          case "walletId":
+            this._walletId = divElem;
+            break;
+          case "horizontalMove":
+            this._horizontalMove = divElem;
+            break;
+          case "horizontalMoveLeft":
+            this._horizontalMoveLeft = divElem;
+            break;
+          case "horizontalMoveRight":
+            this._horizontalMoveRight = divElem;
+            break;
+          case "safetyTile":
+            this._safetyTile = divElem;
+            break;
+          case "safetyTower":
+            this._safetyTower = divElem;
+            break;
+          case "safetyDigit":
+            this._safetyDigit = divElem;
+            break;
+          case "vaultTile":
+            this._vaultTile = divElem;
+            break;
+          case "vaultOpponent":
+            this._vaultOpponent = divElem;
+            break;
+          case "vaultDigit":
+            this._vaultDigit = divElem;
+            break;
+          case "handPointer":
+            this._handPointer = divElem;
         }
-        Array.from(divElem.classList).forEach((name) => {
-          switch (name) {
-            case "walletId":
-              this._walletId = divElem;
-              break;
-            case "horizontalMove":
-              this._horizontalMove = divElem;
-              break;
-            case "horizontalMoveLeft":
-              this._horizontalMoveLeft = divElem;
-              break;
-            case "horizontalMoveRight":
-              this._horizontalMoveRight = divElem;
-              break;
-            case "safetyTile":
-              this._safetyTile = divElem;
-              break;
-            case "safetyTower":
-              this._safetyTower = divElem;
-              break;
-            case "safetyDigit":
-              this._safetyDigit = divElem;
-              break;
-            case "vaultTile":
-              this._vaultTile = divElem;
-              break;
-            case "vaultOpponent":
-              this._vaultOpponent = divElem;
-              break;
-            case "vaultDigit":
-              this._vaultDigit = divElem;
-              break;
-            case "handPointer":
-              this._handPointer = divElem;
-          }
-        });
       });
-      if (
-        !this._walletId ||
-        !this._safetyTile ||
-        !this._safetyTower ||
-        !this._safetyDigit ||
-        !this._vaultTile ||
-        !this._vaultOpponent ||
-        !this._vaultDigit ||
-        !this._handPointer
-      ) {
-        throw new Error("invalid div element for sidebar");
-      }
-      this._svgHorizontalMove = this._horizontalMove.querySelector("svg");
-      this._svgHorizontalMoveLeft =
-        this._horizontalMoveLeft.querySelector("svg");
-      this._svgHorizontalMoveRight =
-        this._horizontalMoveRight.querySelector("svg");
-      if (
-        !this._svgHorizontalMove ||
-        !this._svgHorizontalMoveLeft ||
-        !this._svgHorizontalMoveRight
-      ) {
-        throw new Error("invalid svg element for sidebar");
-      }
-      if (history) {
-        Sidebar.playerMapHistory.set(this._player, this);
-      } else {
-        Sidebar.playerMap.set(this._player, this);
-      }
-    } catch (error) {
-      console.error(error);
+    });
+    if (
+      !this._walletId ||
+      !this._safetyTile ||
+      !this._safetyTower ||
+      !this._safetyDigit ||
+      !this._vaultTile ||
+      !this._vaultOpponent ||
+      !this._vaultDigit ||
+      !this._handPointer
+    ) {
+      throw new Error("invalid div element for sidebar");
+    }
+    this._svgHorizontalMove = this._horizontalMove.querySelector("svg");
+    this._svgHorizontalMoveLeft = this._horizontalMoveLeft.querySelector("svg");
+    this._svgHorizontalMoveRight =
+      this._horizontalMoveRight.querySelector("svg");
+    if (
+      !this._svgHorizontalMove ||
+      !this._svgHorizontalMoveLeft ||
+      !this._svgHorizontalMoveRight
+    ) {
+      throw new Error("invalid svg element for sidebar");
+    }
+    if (history) {
+      Sidebar.playerMapHistory.set(this._player, this);
+    } else {
+      Sidebar.playerMap.set(this._player, this);
     }
   }
 

@@ -4,8 +4,10 @@
  * all IndexedDB API transactions, including game state logs for replay and settings adjustments.
  * @requires module:ConfigState
  * @requires module:Logger
+ * @requires module:AsyncAPIWrapper
+ * @requires module:ErrorUtils
  */
-
+import { handleErrorEvent } from "./ErrorUtils.js";
 import { Settings } from "./ConfigState.js";
 import { workerMessageScheme } from "./AsyncAPIWrapper.js";
 import { LOGGER_DB_ITEMS } from "./Logger.js";
@@ -41,7 +43,7 @@ async function getKeysFromIndexOnly(objStoreName, indexName, indexKey) {
       });
       xact.commit();
     } catch (error) {
-      reject(new Error("Error in xact: " + error.toString()));
+      reject(error);
     }
   });
 }
@@ -79,7 +81,7 @@ async function getAllIndexKeys(objStoreName, indexName) {
         }
       });
     } catch (error) {
-      reject(new Error("Error in xact: " + error.toString()));
+      reject(error);
     }
   });
 }
@@ -124,7 +126,7 @@ async function storeXact(objStoreName, method, parm = null) {
       });
       xact.commit();
     } catch (error) {
-      reject(new Error("Error in xact: " + error.toString()));
+      reject(error);
     }
   });
 }
@@ -164,53 +166,41 @@ async function openDb() {
         throw new Error("Error opening IndexedDB:", event.target.error);
       });
     } catch (error) {
-      reject(new Error("Error opening database: " + error.message));
+      reject(error);
     }
   });
 }
 
 async function open() {
-  try {
-    if (idbFactory === null) {
-      throw new Error(
-        "IndexedDB is not supported in this browser. Please use a modern browser."
-      );
-    }
-    if (db === null) {
-      db = await openDb();
-    }
-    if (initFromScratch === true) {
-      await storeXact(LOGGER_DB_ITEMS.OBJECT_STORE, "clear");
-      await storeXact(Settings.objStoreName, "clear");
-      await storeXact(
-        Settings.objStoreName,
-        "put",
-        Settings.factoryWinningRules
-      );
-      await storeXact(
-        Settings.objStoreName,
-        "put",
-        Settings.factorySearchRules
-      );
-      await storeXact(
-        Settings.objStoreName,
-        "put",
-        Settings.factoryMaterialAdvantageConquered
-      );
-      await storeXact(
-        Settings.objStoreName,
-        "put",
-        Settings.factorySafetyZoneProximity
-      );
-      await storeXact(
-        Settings.objStoreName,
-        "put",
-        Settings.factoryMaterialAdvantageAccounted
-      );
-      initFromScratch = false;
-    }
-  } catch (error) {
-    throw new Error("Error in open db: " + error);
+  if (idbFactory === null) {
+    throw new Error(
+      "IndexedDB is not supported in this browser. Please use a modern browser."
+    );
+  }
+  if (db === null) {
+    db = await openDb();
+  }
+  if (initFromScratch === true) {
+    await storeXact(LOGGER_DB_ITEMS.OBJECT_STORE, "clear");
+    await storeXact(Settings.objStoreName, "clear");
+    await storeXact(Settings.objStoreName, "put", Settings.factoryWinningRules);
+    await storeXact(Settings.objStoreName, "put", Settings.factorySearchRules);
+    await storeXact(
+      Settings.objStoreName,
+      "put",
+      Settings.factoryMaterialAdvantageConquered
+    );
+    await storeXact(
+      Settings.objStoreName,
+      "put",
+      Settings.factorySafetyZoneProximity
+    );
+    await storeXact(
+      Settings.objStoreName,
+      "put",
+      Settings.factoryMaterialAdvantageAccounted
+    );
+    initFromScratch = false;
   }
 }
 
@@ -279,14 +269,15 @@ self.addEventListener("message", async (event) => {
         throw new Error("invalid request type for db worker");
     }
   } catch (error) {
-    console.log(error);
-    const response = structuredClone(workerMessageScheme);
-    response.response.error = true;
-    response.response.message = error;
-    self.postMessage(response);
+    const errorResponse = structuredClone(workerMessageScheme);
+    errorResponse.response.error = true;
+    errorResponse.response.message =
+      "Caught error in DbWorker: " + handleErrorEvent(error);
+    self.postMessage(errorResponse);
   }
 });
 
 self.addEventListener("error", (event) => {
-  console.log(error.toString());
+  handleErrorEvent(error);
+  handleErrorEvent(new Error("Uncaught error in DbWorker"));
 });

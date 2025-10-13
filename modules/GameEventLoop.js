@@ -2,8 +2,10 @@
  * @module GameEventLoop
  * @description
  * @requires module:GameState
+ * @requires module:GameLogic
+ * @requires module:AsyncAPIWrapper
+ * @requires module:main
  */
-
 import { PLAYER_ID, GridCell, BoardState, Sidebar, Move } from "./GameState.js";
 import { checkWin } from "./GameLogic.js";
 import {
@@ -165,146 +167,139 @@ async function playUserMove(
 }
 
 async function playBotMove(domBoardState, settings, aiWorker, loggerWriter) {
-  try {
-    //animate css load spinner
-    const spinner1 = document.querySelector(".spinner1");
-    const spinner2 = document.querySelector(".spinner2");
-    const spinner3 = document.querySelector(".spinner3");
-    const spinner4 = document.querySelector(".spinner4");
-    const spinner5 = document.querySelector(".spinner5");
-    const spinner6 = document.querySelector(".spinner6");
-    spinner1.classList.add("spinner1Animate");
-    spinner2.classList.add("spinner2Animate");
-    spinner3.classList.add("spinner3Animate");
-    spinner4.classList.add("spinner4Animate");
-    spinner5.classList.add("spinner5Animate");
-    spinner6.classList.add("spinner6Animate");
-    spinner1.querySelector("g").classList.remove("svgHide");
-    spinner2.querySelector("g").classList.remove("svgHide");
-    spinner3.querySelector("g").classList.remove("svgHide");
-    spinner4.querySelector("g").classList.remove("svgHide");
-    spinner5.querySelector("g").classList.remove("svgHide");
-    spinner6.querySelector("g").classList.remove("svgHide");
-    // Dispatch worker for AI processing
-    domBoardState.waitForWebWorker = true;
-    const aiWorkerRequest = structuredClone(workerMessageScheme);
-    aiWorkerRequest.request.type = "findBestMove";
-    aiWorkerRequest.request.parameter.push(domBoardState.cloneInstance());
-    aiWorkerRequest.request.parameter.push(settings.cloneInstance());
-    const aiWorkerResponse = await dispatchWorker(
-      aiWorker,
-      aiWorkerRequest,
-      settings.searchRules.settings.timeout * 1000
-    );
-    if (aiWorkerResponse.response.error === true) {
-      if (aiWorkerResponse.response.message === "timeout") {
-        //hide css load spinner
-        spinner1.classList.remove("spinner1Animate");
-        spinner2.classList.remove("spinner2Animate");
-        spinner3.classList.remove("spinner3Animate");
-        spinner4.classList.remove("spinner4Animate");
-        spinner5.classList.remove("spinner5Animate");
-        spinner6.classList.remove("spinner6Animate");
-        spinner1.querySelector("g").classList.add("svgHide");
-        spinner2.querySelector("g").classList.add("svgHide");
-        spinner3.querySelector("g").classList.add("svgHide");
-        spinner4.querySelector("g").classList.add("svgHide");
-        spinner5.querySelector("g").classList.add("svgHide");
-        spinner6.querySelector("g").classList.add("svgHide");
-        reCreateAiWorker();
-        handleAiWorkerTimeout(domBoardState, loggerWriter);
-        return;
-      } else {
-        throw new Error(
-          "Caught error in ai worker: " + aiWorkerResponse.response.message
-        );
-      }
-    }
-    // deserialize ai worker response and map the GridCell instances for the next move
-    let srcCellId = aiWorkerResponse.response.message[0]._id ?? null;
-    let tgtCellId = aiWorkerResponse.response.message[1]._id ?? null;
-    if (
-      srcCellId === null ||
-      tgtCellId === null ||
-      isNaN(srcCellId) ||
-      isNaN(tgtCellId)
-    ) {
-      throw new Error(
-        "Invalid move data received from worker. Expected two integers for the source and target cell identifiers."
-      );
-    }
-    let moveBotSrcInst = domBoardState.cells.find(
-      (cell) => cell.id === srcCellId
-    );
-    moveBotSrcInst ??= null;
-    let moveBotTgtInst = domBoardState.cells.find(
-      (cell) => cell.id === tgtCellId
-    );
-    moveBotTgtInst ??= null;
-    if (
-      moveBotSrcInst === null ||
-      moveBotTgtInst === null ||
-      !moveBotSrcInst instanceof GridCell ||
-      !moveBotTgtInst instanceof GridCell
-    ) {
-      throw new Error(
-        "Invalid move data received from worker. Invalid integer identifier for the source or target cell."
-      );
-    }
-    //hide css load spinner
-    spinner1.classList.remove("spinner1Animate");
-    spinner2.classList.remove("spinner2Animate");
-    spinner3.classList.remove("spinner3Animate");
-    spinner4.classList.remove("spinner4Animate");
-    spinner5.classList.remove("spinner5Animate");
-    spinner6.classList.remove("spinner6Animate");
-    spinner1.querySelector("g").classList.add("svgHide");
-    spinner2.querySelector("g").classList.add("svgHide");
-    spinner3.querySelector("g").classList.add("svgHide");
-    spinner4.querySelector("g").classList.add("svgHide");
-    spinner5.querySelector("g").classList.add("svgHide");
-    spinner6.querySelector("g").classList.add("svgHide");
-    // trigger animations for this bot's move and wait for the end of the css transitions
-    await cssTransitionEnded(moveBotSrcInst.domEl, "select");
-    await cssTransitionEnded(moveBotTgtInst.domEl, "hover");
-    // apply move
-    domBoardState.applyMoveAndTurn(
-      moveBotSrcInst,
-      moveBotTgtInst,
-      settings.winningRules.settings.maxStackSize
-    );
-    // remove css classes for cleanup and animation of this bot's move
-    moveBotSrcInst.domEl.classList.remove("select");
-    moveBotTgtInst.domEl.classList.remove("hover");
-    const playerBot = domBoardState.playerState.twoPlayer.find(
-      (player) => player.turn === false
-    );
-    const playerUser = domBoardState.playerState.twoPlayer.find(
-      (player) => player.turn === true
-    );
-    Sidebar.playerMap.get(playerBot).refreshDashboard();
-    domBoardState.waitForWebWorker = false;
-    if (checkWin(domBoardState, playerBot, settings)) {
-      await loggerWriter.update(
-        new Move(moveBotSrcInst, moveBotTgtInst, domBoardState.playerState)
-      );
-      document.querySelector("#sectHome .board").classList.add("filterGray");
-      Sidebar.playerMap.get(playerBot).refreshDashboard();
-    } else {
-      await loggerWriter.update(
-        new Move(moveBotSrcInst, moveBotTgtInst, domBoardState.playerState)
-      );
-      // mark dashboard
-      Sidebar.playerMap.get(playerUser).markDashboard();
-      Sidebar.playerMap.get(playerBot).unmarkDashboard();
-      // Enable board events for the next move
-      enableBoardEvents(domBoardState);
-    }
-  } catch (error) {
-    if (aiWorker && aiWorker instanceof Worker) {
+  //animate css load spinner
+  const spinner1 = document.querySelector(".spinner1");
+  const spinner2 = document.querySelector(".spinner2");
+  const spinner3 = document.querySelector(".spinner3");
+  const spinner4 = document.querySelector(".spinner4");
+  const spinner5 = document.querySelector(".spinner5");
+  const spinner6 = document.querySelector(".spinner6");
+  spinner1.classList.add("spinner1Animate");
+  spinner2.classList.add("spinner2Animate");
+  spinner3.classList.add("spinner3Animate");
+  spinner4.classList.add("spinner4Animate");
+  spinner5.classList.add("spinner5Animate");
+  spinner6.classList.add("spinner6Animate");
+  spinner1.querySelector("g").classList.remove("svgHide");
+  spinner2.querySelector("g").classList.remove("svgHide");
+  spinner3.querySelector("g").classList.remove("svgHide");
+  spinner4.querySelector("g").classList.remove("svgHide");
+  spinner5.querySelector("g").classList.remove("svgHide");
+  spinner6.querySelector("g").classList.remove("svgHide");
+  // Dispatch worker for AI processing
+  domBoardState.waitForWebWorker = true;
+  const aiWorkerRequest = structuredClone(workerMessageScheme);
+  aiWorkerRequest.request.type = "findBestMove";
+  aiWorkerRequest.request.parameter.push(domBoardState.cloneInstance());
+  aiWorkerRequest.request.parameter.push(settings.cloneInstance());
+  const aiWorkerResponse = await dispatchWorker(
+    aiWorker,
+    aiWorkerRequest,
+    settings.searchRules.settings.timeout * 1000
+  );
+  if (aiWorkerResponse.response.error === true) {
+    if (aiWorkerResponse.response.message === "timeout") {
+      //hide css load spinner
+      spinner1.classList.remove("spinner1Animate");
+      spinner2.classList.remove("spinner2Animate");
+      spinner3.classList.remove("spinner3Animate");
+      spinner4.classList.remove("spinner4Animate");
+      spinner5.classList.remove("spinner5Animate");
+      spinner6.classList.remove("spinner6Animate");
+      spinner1.querySelector("g").classList.add("svgHide");
+      spinner2.querySelector("g").classList.add("svgHide");
+      spinner3.querySelector("g").classList.add("svgHide");
+      spinner4.querySelector("g").classList.add("svgHide");
+      spinner5.querySelector("g").classList.add("svgHide");
+      spinner6.querySelector("g").classList.add("svgHide");
       reCreateAiWorker();
+      handleAiWorkerTimeout(domBoardState, loggerWriter);
+      return;
+    } else {
+      throw new Error(
+        "Caught error in ai worker: " + aiWorkerResponse.response.message
+      );
     }
-    console.error("Error during bot move:", error.message);
+  }
+  // deserialize ai worker response and map the GridCell instances for the next move
+  let srcCellId = aiWorkerResponse.response.message[0]._id ?? null;
+  let tgtCellId = aiWorkerResponse.response.message[1]._id ?? null;
+  if (
+    srcCellId === null ||
+    tgtCellId === null ||
+    isNaN(srcCellId) ||
+    isNaN(tgtCellId)
+  ) {
+    throw new Error(
+      "Invalid move data received from worker. Expected two integers for the source and target cell identifiers."
+    );
+  }
+  let moveBotSrcInst = domBoardState.cells.find(
+    (cell) => cell.id === srcCellId
+  );
+  moveBotSrcInst ??= null;
+  let moveBotTgtInst = domBoardState.cells.find(
+    (cell) => cell.id === tgtCellId
+  );
+  moveBotTgtInst ??= null;
+  if (
+    moveBotSrcInst === null ||
+    moveBotTgtInst === null ||
+    !moveBotSrcInst instanceof GridCell ||
+    !moveBotTgtInst instanceof GridCell
+  ) {
+    throw new Error(
+      "Invalid move data received from worker. Invalid integer identifier for the source or target cell."
+    );
+  }
+  //hide css load spinner
+  spinner1.classList.remove("spinner1Animate");
+  spinner2.classList.remove("spinner2Animate");
+  spinner3.classList.remove("spinner3Animate");
+  spinner4.classList.remove("spinner4Animate");
+  spinner5.classList.remove("spinner5Animate");
+  spinner6.classList.remove("spinner6Animate");
+  spinner1.querySelector("g").classList.add("svgHide");
+  spinner2.querySelector("g").classList.add("svgHide");
+  spinner3.querySelector("g").classList.add("svgHide");
+  spinner4.querySelector("g").classList.add("svgHide");
+  spinner5.querySelector("g").classList.add("svgHide");
+  spinner6.querySelector("g").classList.add("svgHide");
+  // trigger animations for this bot's move and wait for the end of the css transitions
+  await cssTransitionEnded(moveBotSrcInst.domEl, "select");
+  await cssTransitionEnded(moveBotTgtInst.domEl, "hover");
+  // apply move
+  domBoardState.applyMoveAndTurn(
+    moveBotSrcInst,
+    moveBotTgtInst,
+    settings.winningRules.settings.maxStackSize
+  );
+  // remove css classes for cleanup and animation of this bot's move
+  moveBotSrcInst.domEl.classList.remove("select");
+  moveBotTgtInst.domEl.classList.remove("hover");
+  const playerBot = domBoardState.playerState.twoPlayer.find(
+    (player) => player.turn === false
+  );
+  const playerUser = domBoardState.playerState.twoPlayer.find(
+    (player) => player.turn === true
+  );
+  Sidebar.playerMap.get(playerBot).refreshDashboard();
+  domBoardState.waitForWebWorker = false;
+  if (checkWin(domBoardState, playerBot, settings)) {
+    await loggerWriter.update(
+      new Move(moveBotSrcInst, moveBotTgtInst, domBoardState.playerState)
+    );
+    document.querySelector("#sectHome .board").classList.add("filterGray");
+    Sidebar.playerMap.get(playerBot).refreshDashboard();
+  } else {
+    await loggerWriter.update(
+      new Move(moveBotSrcInst, moveBotTgtInst, domBoardState.playerState)
+    );
+    // mark dashboard
+    Sidebar.playerMap.get(playerUser).markDashboard();
+    Sidebar.playerMap.get(playerBot).unmarkDashboard();
+    // Enable board events for the next move
+    enableBoardEvents(domBoardState);
   }
 }
 
