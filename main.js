@@ -738,12 +738,12 @@ async function initReplayLoggerEventHandlers() {
         ".footerReplayPlayPause .iconPause"
       );
       if (gridItem.classList.contains("navbarReturnHome")) {
+        window.location.hash = "#sectHome";
         if (iconPlay.classList.contains("svgHide")) {
           iconPlay.classList.toggle("svgHide");
           iconPause.classList.toggle("svgHide");
           await autoPlayTerminate();
         }
-        window.location.hash = "#sectHome";
       }
       if (gridItem.classList.contains("navbarUploadModal")) {
         if (iconPlay.classList.contains("svgHide")) {
