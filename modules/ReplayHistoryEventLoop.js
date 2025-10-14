@@ -17,47 +17,53 @@ const AUTOPLAY_SETTINGS = Object.freeze({
 });
 
 async function loadGameHistoryMove(advanceSteps) {
-  if (
-    LoggerReader.instances.size === 0 ||
-    !LoggerReader.currentSelectedInstance
-  ) {
-    return;
-  }
-  const loggerReader = LoggerReader.currentSelectedInstance;
-  const record = await loggerReader.fetchRecord(advanceSteps);
-  const gridCells = record.boardState._cells;
-  const domChildren = Array.from(LoggerReader.historyBoard.children);
-  domChildren.forEach((domGridItem, index) => {
-    domGridItem.classList.remove("mark", "click");
-    const gridCell = gridCells[index];
-    const svgLayout = gridCell._svgLayout;
-    const hasDot = gridCell._dot;
-    updateSvg(domGridItem, svgLayout, hasDot);
-  });
-  if (record.lastMove) {
-    const moveSrcCell = record.lastMove._srcCell;
-    const moveTgtCell = record.lastMove._tgtCell;
-    const moveSrcDomCell = domChildren.find((cell, index) => {
-      if (index === moveSrcCell._id) {
-        return true;
+  await navigator.locks.request(
+    "loadGameHistoryMove",
+    { mode: "exclusive" },
+    async (lock) => {
+      if (
+        LoggerReader.instances.size === 0 ||
+        !LoggerReader.currentSelectedInstance
+      ) {
+        return;
       }
-    });
-    const moveTgtDomCell = domChildren.find((cell, index) => {
-      if (index === moveTgtCell._id) {
-        return true;
+      const loggerReader = LoggerReader.currentSelectedInstance;
+      const record = await loggerReader.fetchRecord(advanceSteps);
+      const gridCells = record.boardState._cells;
+      const domChildren = Array.from(LoggerReader.historyBoard.children);
+      domChildren.forEach((domGridItem, index) => {
+        domGridItem.classList.remove("mark", "click");
+        const gridCell = gridCells[index];
+        const svgLayout = gridCell._svgLayout;
+        const hasDot = gridCell._dot;
+        updateSvg(domGridItem, svgLayout, hasDot);
+      });
+      if (record.lastMove) {
+        const moveSrcCell = record.lastMove._srcCell;
+        const moveTgtCell = record.lastMove._tgtCell;
+        const moveSrcDomCell = domChildren.find((cell, index) => {
+          if (index === moveSrcCell._id) {
+            return true;
+          }
+        });
+        const moveTgtDomCell = domChildren.find((cell, index) => {
+          if (index === moveTgtCell._id) {
+            return true;
+          }
+        });
+        moveSrcDomCell.classList.add("mark");
+        moveTgtDomCell.classList.add("click");
       }
-    });
-    moveSrcDomCell.classList.add("mark");
-    moveTgtDomCell.classList.add("click");
-  }
-  if (record.move === 0) {
-    record.boardState._playerState._twoPlayer.forEach((player) => {
-      player._turn = false;
-    });
-  }
-  prettifyMoveNumber(record.move);
-  refreshSidebars(record.boardState._playerState);
-  updateLastBotMove(record.move, record.boardState._playerState);
+      if (record.move === 0) {
+        record.boardState._playerState._twoPlayer.forEach((player) => {
+          player._turn = false;
+        });
+      }
+      prettifyMoveNumber(record.move);
+      refreshSidebars(record.boardState._playerState);
+      updateLastBotMove(record.move, record.boardState._playerState);
+    }
+  );
 }
 
 async function waitForNextAutoPlay(timeout = AUTOPLAY_SETTINGS.TIMEOUT) {
@@ -102,7 +108,24 @@ async function autoPlayManager() {
 }
 
 async function autoPlayTerminate() {
-  await autoPlayTerminated(LoggerReader.currentSelectedInstance);
+  await navigator.locks.request(
+    "autoPlayTerminate",
+    { mode: "exclusive", ifAvailable: true },
+    async (lock) => {
+      if (!lock) {
+        return;
+      }
+      const reader = LoggerReader.currentSelectedInstance;
+      if (
+        !reader ||
+        reader.autoPlayActive === false ||
+        reader.eventTarget !== null
+      ) {
+        return;
+      }
+      await autoPlayTerminated(reader);
+    }
+  );
 }
 
 function updateSvg(domEl, svgLayout, dot) {

@@ -645,6 +645,25 @@ function reCreateAiWorker() {
   aiWorker = new Worker("./modules/AiWorker.js", { type: "module" });
 }
 
+function togglePlayPauseIcon(
+  iconPlay = null,
+  iconPause = null,
+  togglePlay = true,
+  togglePause
+) {
+  if (iconPlay === null || iconPause === null) {
+    const domReplayLogger = document.querySelector("#sectReplayLogger");
+    iconPlay = domReplayLogger.querySelector(
+      ".footerReplayPlayPause .iconPlay"
+    );
+    iconPause = domReplayLogger.querySelector(
+      ".footerReplayPlayPause .iconPause"
+    );
+  }
+  iconPlay.classList.toggle("svgHide");
+  iconPause.classList.toggle("svgHide");
+}
+
 /**
  * This function:
  * - Initially loads all game id index keys from the ReplayLogger object store
@@ -680,6 +699,7 @@ async function initReplayLoggerEventHandlers() {
   );
   domReplayLogger.addEventListener("click", async (event) => {
     try {
+      const domReplayLogger = event.currentTarget;
       const icon = event.target.closest("svg");
       const gridItem = icon.closest("div");
       if (!icon || !gridItem || !icon.classList.contains("icon2")) {
@@ -703,17 +723,34 @@ async function initReplayLoggerEventHandlers() {
         if (!iconPlay || !iconPause) {
           throw new Error("cannot relocate play or pause icon");
         }
-        if (iconPlay.classList.contains("svgHide")) {
-          iconPlay.classList.remove("svgHide");
-          iconPause.classList.add("svgHide");
+        iconPlay.classList.toggle("svgHide");
+        iconPause.classList.toggle("svgHide");
+        if (iconPause.classList.contains("svgHide")) {
           await autoPlayTerminate();
         } else {
-          iconPlay.classList.add("svgHide");
-          iconPause.classList.remove("svgHide");
           await autoPlayManager();
         }
       }
+      const iconPlay = domReplayLogger.querySelector(
+        ".footerReplayPlayPause .iconPlay"
+      );
+      const iconPause = domReplayLogger.querySelector(
+        ".footerReplayPlayPause .iconPause"
+      );
+      if (gridItem.classList.contains("navbarReturnHome")) {
+        if (iconPlay.classList.contains("svgHide")) {
+          iconPlay.classList.toggle("svgHide");
+          iconPause.classList.toggle("svgHide");
+          await autoPlayTerminate();
+        }
+        window.location.hash = "#sectHome";
+      }
       if (gridItem.classList.contains("navbarUploadModal")) {
+        if (iconPlay.classList.contains("svgHide")) {
+          iconPlay.classList.toggle("svgHide");
+          iconPause.classList.toggle("svgHide");
+          await autoPlayTerminate();
+        }
         const dialogForGameSelection =
           gridItem.querySelector(".dialogUploadModal");
         if (!dialogForGameSelection) {
@@ -722,6 +759,11 @@ async function initReplayLoggerEventHandlers() {
         dialogForGameSelection.showModal();
       }
       if (gridItem.classList.contains("navbarReplayCommit")) {
+        if (iconPlay.classList.contains("svgHide")) {
+          iconPlay.classList.toggle("svgHide");
+          iconPause.classList.toggle("svgHide");
+          await autoPlayTerminate();
+        }
         const dialogReplayCommit = gridItem.querySelector(
           ".dialogReplayCommit"
         );
