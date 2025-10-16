@@ -115,7 +115,8 @@ function createBoard(domBoard) {
     "fillColorUser",
     "fillColorBot",
     "fillColorDot",
-    "strokeColor"
+    "strokeColor",
+    "svgShadowTransition"
   );
   const use1 = document.createElementNS("http://www.w3.org/2000/svg", "use");
   use1.setAttribute("href", "./images/pieces.svg#tower_none");

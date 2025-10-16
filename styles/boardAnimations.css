@@ -28,7 +28,8 @@
 /* because it contains explicitly defined css properties, which break the default    */
 /* css cascading and inheritance chain.                                              */
 /* ********************************************************************************* */
-* {
+*,
+.svgShadowTransition {
   transition-property: background-color, fill, stroke, filter;
   transition-duration: 0.8s;
   transition-timing-function: linear;
