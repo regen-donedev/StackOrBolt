@@ -287,6 +287,30 @@ async function dialogSelectBtnEventHandler(event) {
   }
 }
 
+async function dialogNoHistoryDataBtnEventHandler(event) {
+  try {
+    const clickedIcon = event.target.closest("svg");
+    if (!clickedIcon || !(clickedIcon instanceof SVGSVGElement)) {
+      return;
+    }
+    const dialog = event.target.closest(".dialogUploadNoData");
+    if (!dialog || !(dialog instanceof HTMLDialogElement)) {
+      return;
+    }
+    const container = dialog.querySelector(".dialogConfirmContainer");
+    if (!container || !(container instanceof HTMLDivElement)) {
+      return;
+    }
+    if (!clickedIcon.classList.contains("iconConfirm")) {
+      return;
+    }
+    dialog.close();
+  } catch (error) {
+    handleErrorEvent(error);
+    throw new Error(error);
+  }
+}
+
 async function dialogReplayCommitEventHandler(event) {
   try {
     const clickedIcon = event.target.closest("svg");
@@ -336,4 +360,5 @@ export {
   updateSvg,
   dialogSelectBtnEventHandler,
   dialogReplayCommitEventHandler,
+  dialogNoHistoryDataBtnEventHandler,
 };

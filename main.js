@@ -50,13 +50,14 @@ import {
   updateSvg,
   dialogSelectBtnEventHandler,
   dialogReplayCommitEventHandler,
+  dialogNoHistoryDataBtnEventHandler,
 } from "./modules/ReplayHistoryEventLoop.js";
 
 let TEXT_FITTING = Object.freeze({
-  xl: { MIN_VMIN: 1000, MIN_FONT: 1.8, MAX_VMIN: 1500, MAX_FONT: 2.2 },
-  l: { MIN_VMIN: 800, MIN_FONT: 1.4, MAX_VMIN: 1000, MAX_FONT: 1.8 },
-  m: { MIN_VMIN: 600, MIN_FONT: 0.7, MAX_VMIN: 800, MAX_FONT: 1.0 },
-  s: { MIN_VMIN: 300, MIN_FONT: 0.4, MAX_VMIN: 600, MAX_FONT: 0.7 },
+  xl: { MIN_VMIN: 1000, MIN_FONT: 1.8, MAX_VMIN: 1500, MAX_FONT: 2.5 },
+  l: { MIN_VMIN: 800, MIN_FONT: 1.2, MAX_VMIN: 1000, MAX_FONT: 1.8 },
+  m: { MIN_VMIN: 600, MIN_FONT: 0.6, MAX_VMIN: 800, MAX_FONT: 0.9 },
+  s: { MIN_VMIN: 300, MIN_FONT: 0.4, MAX_VMIN: 600, MAX_FONT: 0.6 },
 });
 let aiWorker;
 let dbWorker;
@@ -83,25 +84,18 @@ function getRemSizeInPixels() {
  * Forces a CSS re-evaluation for a given svg element to fix iOS light-dark() issues.
  * @param {HTMLElement} container - The element holding the SVG/use content.
  */
-function forceSvgIosRepaint(container) {
-  if (!container) return;
+function forceSvgShadowDOMRepaint() {
+  const root = document.documentElement;
+  const dummyClass = "ios-repaint-fix";
 
-  // We only need this for iOS browsers, but applying it conditionally is complex.
-  // Applying it generally is usually safe, but use a small delay for stability.
+  // 1. Add a dummy class (forces a style recalculation)
+  root.classList.add(dummyClass);
 
-  // Use a small timeout to ensure the browser has finished painting
-  // the element and registered the prefers-color-scheme.
-  setTimeout(() => {
-    const originalDisplay = container.style.display;
-
-    // 1. Force a repaint start
-    container.style.display = "contents";
-
-    // 2. Revert to original display on the next animation frame
-    requestAnimationFrame(() => {
-      container.style.display = originalDisplay;
-    });
-  }, 50); // 50ms is usually safe post-append
+  // 2. Schedule the removal on the next animation frame (forces a second recalculation/repaint)
+  // This is the absolute latest point before the browser paints the next frame.
+  requestAnimationFrame(() => {
+    root.classList.remove(dummyClass);
+  });
 }
 
 /**
@@ -129,12 +123,12 @@ function createBoard(domBoard) {
 
   Array.from(domBoard.children).forEach((domCell, index) => {
     domCell.appendChild(svg1.cloneNode(true));
-    forceSvgIosRepaint(domCell);
     const column = index % 6;
     const row = Math.round((index - column) / 6);
     const cell = new GridCell(row, column, true, domCell);
     cells.push(cell);
   });
+  forceSvgShadowDOMRepaint();
   const domBoardState = new BoardState(
     cells,
     createPlayer(),
@@ -745,17 +739,29 @@ async function initReplayLoggerEventHandlers() {
   if (!gameReplayScrollContainer) {
     throw new Error("cannot relocate scroll container for dialog element");
   }
-  const dialogConfirmContainer = domReplayLogger.querySelector(
+  const dialogConfirmContainerCommit = domReplayLogger.querySelector(
     ".dialogReplayCommit .dialogConfirmContainer"
   );
-  if (!dialogConfirmContainer) {
+  if (!dialogConfirmContainerCommit) {
     throw new Error(
       "cannot relocate container element for replay commit confirmation"
     );
   }
-  dialogConfirmContainer.addEventListener(
+  dialogConfirmContainerCommit.addEventListener(
     "click",
     dialogReplayCommitEventHandler
+  );
+  const dialogConfirmContainerNoHistoryData = domReplayLogger.querySelector(
+    ".dialogUploadNoData .dialogConfirmContainer"
+  );
+  if (!dialogConfirmContainerNoHistoryData) {
+    throw new Error(
+      "cannot relocate container element for no game history data confirmation"
+    );
+  }
+  dialogConfirmContainerNoHistoryData.addEventListener(
+    "click",
+    dialogNoHistoryDataBtnEventHandler
   );
   domReplayLogger.addEventListener("click", async (event) => {
     try {
@@ -816,7 +822,15 @@ async function initReplayLoggerEventHandlers() {
         if (!dialogForGameSelection) {
           throw new Error("cannot relocate dialog element");
         }
-        dialogForGameSelection.showModal();
+        const dialogNoData = gridItem.querySelector(".dialogUploadNoData");
+        if (!dialogNoData) {
+          throw new Error("cannot relocate dialog element");
+        }
+        if (LoggerReader.instances.size === 0) {
+          dialogNoData.showModal();
+        } else {
+          dialogForGameSelection.showModal();
+        }
       }
       if (gridItem.classList.contains("navbarReplayCommit")) {
         if (iconPlay.classList.contains("svgHide")) {
@@ -841,7 +855,7 @@ async function initReplayLoggerEventHandlers() {
             "cannot relocate last bot move attribute or cancel icon"
           );
         }
-        const dialogConfirmCaption = dialogConfirmContainer.querySelector(
+        const dialogConfirmCaption = dialogConfirmContainerCommit.querySelector(
           ".dialogConfirmCaption p"
         );
         if (!dialogConfirmCaption) {
