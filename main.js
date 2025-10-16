@@ -81,21 +81,21 @@ function getRemSizeInPixels() {
 }
 
 /**
- * Forces a CSS re-evaluation for a given svg element to fix iOS light-dark() issues.
- * @param {HTMLElement} container - The element holding the SVG/use content.
+ * Force CSS color-scheme selection because of iOS user agent issues for imbedded svg shado root content.
+ * @param {void}
  */
-function forceSvgShadowDOMRepaint() {
-  const root = document.documentElement;
-  const dummyClass = "ios-repaint-fix";
-
-  // 1. Add a dummy class (forces a style recalculation)
-  root.classList.add(dummyClass);
-
-  // 2. Schedule the removal on the next animation frame (forces a second recalculation/repaint)
-  // This is the absolute latest point before the browser paints the next frame.
-  requestAnimationFrame(() => {
-    root.classList.remove(dummyClass);
-  });
+function forceCSSColorSchemeSelection() {
+  const radioThemeLight = document.querySelector(
+    "#sectHome input.radioThemeLight"
+  );
+  const radioThemeDark = document.querySelector(
+    "#sectHome input.radioThemeDark"
+  );
+  if (window.matchMedia("(prefers-color-scheme : light)").matches === true) {
+    radioThemeLight.checked = true;
+  } else {
+    radioThemeDark.checked = true;
+  }
 }
 
 /**
@@ -128,7 +128,6 @@ function createBoard(domBoard) {
     const cell = new GridCell(row, column, true, domCell);
     cells.push(cell);
   });
-  forceSvgShadowDOMRepaint();
   const domBoardState = new BoardState(
     cells,
     createPlayer(),
@@ -919,6 +918,7 @@ window.addEventListener("load", async (_) => {
     }
     const domBoard = document.querySelector("#sectHome .board");
     const domBoardState = createBoard(domBoard);
+    forceCSSColorSchemeSelection();
     BoardState.currentLiveInstance = domBoardState;
     LoggerReader.initialDomBoardState = domBoardState.cloneInstance();
     LoggerReader.historyBoard = createHistoryBoard(domBoardState);
