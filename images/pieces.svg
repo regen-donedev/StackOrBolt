@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <defs>
+    <!-- <defs>
         <style>
             * {
                 transition-property: background-color, fill, stroke, filter;
@@ -7,7 +7,7 @@
                 transition-timing-function: linear;
             }
         </style>
-    </defs>
+    </defs> -->
     <symbol id="tower_none">
         <g></g>
     </symbol>
