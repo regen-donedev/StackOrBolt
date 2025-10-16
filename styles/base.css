@@ -6,10 +6,21 @@
   &:has(input[name="theme"][class="radioThemeLight"]:checked) {
     color-scheme: light;
   }
-  /* @link https://utopia.fyi/clamp/calculator?a=360,1240,16—28 */
-  --text-size: clamp(1rem, 0.6932rem + 1.3636vw, 1.75rem);
-  /* @link https://utopia.fyi/clamp/calculator?a=360,1240,10—14 */
-  --text-size-small: clamp(0.625rem, 0.5227rem + 0.4545vw, 0.875rem);
+  /* ********************************** */
+  /* sizes for text-scaling             */
+  /*  xl: 1000px < vmin                 */
+  /*   l:  800px < vmin < 1000px        */
+  /*   m:  600px < vmin <  800px        */
+  /*   s:          vmin <  600px        */
+  /* ********************************** */
+  /* --text-size-xl: clamp(1.5rem, 0.5rem + 1.6vmin, 2rem);
+  --text-size-l: clamp(0.8rem, -2rem + 5.6vmin, 1.5rem);
+  --text-size-m: clamp(0.5rem, -0.7rem + 3.2vmin, 0.9rem);
+  --text-size-s: clamp(0.2rem, -0.1rem + 1.6vmin, 0.5rem); */
+  --text-size-xl: 2rem;
+  --text-size-l: 2rem;
+  --text-size-m: 0.9rem;
+  --text-size-s: 0.3rem;
   --dark-bg-color: #2e2e2e;
   --dark-bot-color: #fb8c00;
   --dark-user-color: #ec407a;
@@ -42,7 +53,7 @@ body {
   width: 100dvw;
   box-sizing: border-box;
   overflow: hidden;
-  font-size: var(--text-size);
+  font-size: var(--text-size-l);
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   overflow-wrap: break-word;

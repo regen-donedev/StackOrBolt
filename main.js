@@ -51,9 +51,58 @@ import {
   dialogSelectBtnEventHandler,
   dialogReplayCommitEventHandler,
 } from "./modules/ReplayHistoryEventLoop.js";
+
+let TEXT_FITTING = Object.freeze({
+  xl: { MIN_VMIN: 1000, MIN_FONT: 1.8, MAX_VMIN: 1500, MAX_FONT: 2.2 },
+  l: { MIN_VMIN: 800, MIN_FONT: 1.4, MAX_VMIN: 1000, MAX_FONT: 1.8 },
+  m: { MIN_VMIN: 600, MIN_FONT: 0.7, MAX_VMIN: 800, MAX_FONT: 1.0 },
+  s: { MIN_VMIN: 300, MIN_FONT: 0.4, MAX_VMIN: 600, MAX_FONT: 0.7 },
+});
 let aiWorker;
 let dbWorker;
 let isFatalError = false;
+
+/**
+ * Computes the rem size in pixels (usually 16px).
+ * @param {void}
+ */
+function getRemSizeInPixels() {
+  // 1. Get the <html> element (the root of the document)
+  const rootElement = document.documentElement;
+
+  // 2. Use getComputedStyle to read the final, resolved 'font-size' property
+  const computedStyle = window.getComputedStyle(rootElement);
+
+  // 3. The value is returned as a string (e.g., "16px"). We parse it to a float.
+  const remSize = parseFloat(computedStyle.fontSize);
+
+  return remSize; // This will return 16 (or 10, or whatever it is set to)
+}
+
+/**
+ * Forces a CSS re-evaluation for a given svg element to fix iOS light-dark() issues.
+ * @param {HTMLElement} container - The element holding the SVG/use content.
+ */
+function forceSvgIosRepaint(container) {
+  if (!container) return;
+
+  // We only need this for iOS browsers, but applying it conditionally is complex.
+  // Applying it generally is usually safe, but use a small delay for stability.
+
+  // Use a small timeout to ensure the browser has finished painting
+  // the element and registered the prefers-color-scheme.
+  setTimeout(() => {
+    const originalDisplay = container.style.display;
+
+    // 1. Force a repaint start
+    container.style.display = "contents";
+
+    // 2. Revert to original display on the next animation frame
+    requestAnimationFrame(() => {
+      container.style.display = originalDisplay;
+    });
+  }, 50); // 50ms is usually safe post-append
+}
 
 /**
  * Creates a game board by generating a grid of cells, initializing their state,
@@ -80,6 +129,7 @@ function createBoard(domBoard) {
 
   Array.from(domBoard.children).forEach((domCell, index) => {
     domCell.appendChild(svg1.cloneNode(true));
+    forceSvgIosRepaint(domCell);
     const column = index % 6;
     const row = Math.round((index - column) / 6);
     const cell = new GridCell(row, column, true, domCell);
@@ -822,10 +872,30 @@ async function initReplayLoggerEventHandlers() {
   );
 }
 
+window.addEventListener("DOMContentLoaded", (_) => {
+  const root = document.documentElement;
+  const remInPx = getRemSizeInPixels();
+  for (const [key, value] of Object.entries(TEXT_FITTING)) {
+    const cssVariableName = `--text-size-${key}`;
+    const minFontRem = value["MIN_FONT"];
+    const maxFontRem = value["MAX_FONT"];
+    const minVminPx = value["MIN_VMIN"];
+    const maxVminPx = value["MAX_VMIN"];
+    let slope = ((maxFontRem - minFontRem) * remInPx) / (maxVminPx - minVminPx);
+    slope = Math.trunc(slope * 100) / 100;
+    let yIntercept = minFontRem * remInPx - slope * minVminPx;
+    const yInterceptRem = Math.trunc((yIntercept / remInPx) * 100) / 100;
+    const cssVariableValue = `clamp(${minFontRem}rem, ${yInterceptRem}rem + ${
+      slope * 100
+    }vmin, ${maxFontRem}rem)`;
+    root.style.setProperty(cssVariableName, cssVariableValue);
+  }
+});
+
 /**
  * Main entry point for the game.
  */
-window.addEventListener("load", async () => {
+window.addEventListener("load", async (_) => {
   try {
     window.location.hash = "#sectHome";
     if (!window.Worker) {
