@@ -397,6 +397,11 @@ function initRangeSlidersFromDb(settings, inputs, outputs) {
           settings.safetyZoneProximity.settings.weightRowDistance5
         );
         break;
+      case "safetyZoneOpponentWeight":
+        input.value = String(
+          settings.safetyZoneProximity.settings.opponentWeight
+        );
+        break;
       case "safetyZoneTotalWeight":
         input.value = String(settings.safetyZoneProximity.settings.totalWeight);
         break;
@@ -468,6 +473,11 @@ async function saveCurrentSettings(domInputs, dbSettings) {
         break;
       case "safetyZone5":
         newSafetyZoneProximity.settings.weightRowDistance5 = Number(
+          input.value
+        );
+        break;
+      case "safetyZoneOpponentWeight":
+        newSafetyZoneProximity.settings.opponentWeight = parseFloat(
           input.value
         );
         break;

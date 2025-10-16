@@ -13,7 +13,7 @@ import { resetGame } from "./GameEventLoop.js";
 import { autoPlayTerminated } from "./AsyncAPIWrapper.js";
 
 const AUTOPLAY_SETTINGS = Object.freeze({
-  TIMEOUT: 2000,
+  TIMEOUT: 1500,
 });
 
 async function loadGameHistoryMove(advanceSteps) {

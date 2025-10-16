@@ -96,6 +96,7 @@ class Settings {
       weightRowDistance3: 8,
       weightRowDistance4: 7,
       weightRowDistance5: 7,
+      opponentWeight: 2.0,
       totalWeight: 10,
     },
   });

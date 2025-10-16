@@ -829,7 +829,7 @@ class Player {
    * @param {boolean} value
    */
   set safetyTower(value) {
-    this._safetyTower = value;
+    this._safetyTower = Math.min(6, value);
   }
 
   /**
@@ -851,8 +851,8 @@ class Player {
    * @param {PlayerVault} value
    */
   set vault(value) {
-    this._vault.self = value.self;
-    this._vault.opponent = value.opponent;
+    this._vault.self = Math.min(6, value.self);
+    this._vault.opponent = Math.min(6, value.opponent);
   }
 
   /**
@@ -1067,7 +1067,6 @@ class Move {
  * @property {HTMLDivElement} horizontalMoveRight - The html child element indicating the users's lock state for horizontal movement.
  * @property {SVGSVGElement} svgHorizontalMoveRight - The svg child element icon indicating the users's lock state for horizontal movement.
  * @property {HTMLDivElement} safetyTile - The html child element for the background icon of safety tower information.
- * @property {HTMLDivElement} safetyTower - The html child element for the svg representing the player's tower layout.
  * @property {HTMLDivElement} safetyDigit - The html child element containing all svg icons representing a digit for the number of safety towers.
  * @property {HTMLDivElement} vaultTile - The html child element for the background of the player's vault.
  * @property {HTMLDivElement} vaultOpponent - The html element for the svg representing an opponents stone.
@@ -1168,14 +1167,6 @@ class Sidebar {
   _safetyTile;
 
   /**
-   * The html child element for the svg representing the player's tower layout
-   * @private
-   * @type {HTMLDivElement}
-   * @readonly
-   */
-  _safetyTower;
-
-  /**
    * The html child element containing all svg icons representing a digit for the number of towers brought back to safety.
    * @private
    * @type {HTMLDivElement}
@@ -1264,9 +1255,6 @@ class Sidebar {
           case "safetyTile":
             this._safetyTile = divElem;
             break;
-          case "safetyTower":
-            this._safetyTower = divElem;
-            break;
           case "safetyDigit":
             this._safetyDigit = divElem;
             break;
@@ -1287,7 +1275,6 @@ class Sidebar {
     if (
       !this._walletId ||
       !this._safetyTile ||
-      !this._safetyTower ||
       !this._safetyDigit ||
       !this._vaultTile ||
       !this._vaultOpponent ||

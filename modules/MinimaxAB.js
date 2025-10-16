@@ -128,9 +128,12 @@ function getTerminalNodeState(boardState, depth) {
     // Increase the heuristic score for Safety Zone Proximity
     // by applying the final weight for the total difference.
     if (cachedSettingsState.winningRules.settings.safetyZone > 0) {
-      score +=
-        (botTowerSafetyWeight - 2 * userTowerSafetyWeight) *
-        cachedSettingsState.safetyZoneProximity.settings.totalWeight;
+      score += Math.round(
+        (botTowerSafetyWeight -
+          cachedSettingsState.safetyZoneProximity.settings.opponentWeight *
+            userTowerSafetyWeight) *
+          cachedSettingsState.safetyZoneProximity.settings.totalWeight
+      );
     }
     // Increase the heuristic score for Accounted Material Advantage
     // by applying the final weight for the total difference.

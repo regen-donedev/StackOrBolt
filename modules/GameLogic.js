@@ -239,10 +239,10 @@ function checkWin(boardState, player, settings) {
   const opponent = boardState.playerState.twoPlayer.find(
     (playerInst) => playerInst.id !== player.id
   );
-  const opponentTower = boardState.cells.find(
+  let opponentTower = boardState.cells.find(
     (cell) => cell.svgLayout.at(-1) === opponent.id
   );
-  const owningTower = boardState.cells.find(
+  let owningTower = boardState.cells.find(
     (cell) => cell.svgLayout.at(-1) === player.id
   );
   opponentTower ??= null;
