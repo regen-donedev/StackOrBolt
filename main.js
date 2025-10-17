@@ -56,8 +56,8 @@ import {
 
 let TEXT_FITTING = Object.freeze({
   l: { MIN_VMIN: 800, MIN_FONT: 1.3, MAX_VMIN: 1500, MAX_FONT: 1.5 },
-  m: { MIN_VMIN: 600, MIN_FONT: 1.1, MAX_VMIN: 800, MAX_FONT: 1.3 },
-  s: { MIN_VMIN: 300, MIN_FONT: 0.6, MAX_VMIN: 600, MAX_FONT: 0.8 },
+  m: { MIN_VMIN: 600, MIN_FONT: 1.0, MAX_VMIN: 800, MAX_FONT: 1.2 },
+  s: { MIN_VMIN: 300, MIN_FONT: 0.5, MAX_VMIN: 600, MAX_FONT: 0.6 },
 });
 let aiWorker;
 let dbWorker;
