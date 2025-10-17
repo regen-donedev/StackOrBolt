@@ -117,14 +117,17 @@
           & label {
             min-width: 0;
             width: 90%;
-            overflow: scroll;
-            font-size: var(--text-size-l);
-            @container textFitter (width < 800px) or (height < 800px) {
-              font-size: var(--text-size-m);
-            }
-            @container textFitter (width < 600px) or (height < 600px) {
-              font-size: var(--text-size-s);
-            }
+          }
+        }
+        & > fieldset,
+        & output {
+          overflow: scroll;
+          font-size: var(--text-size-l);
+          @container textFitter (width < 800px) or (height < 800px) {
+            font-size: var(--text-size-m);
+          }
+          @container textFitter (width < 600px) or (height < 600px) {
+            font-size: var(--text-size-s);
           }
         }
       }
