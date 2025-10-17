@@ -494,7 +494,7 @@ class LoggerReader {
     this._scrollItem.setAttribute("data-db-key", String(this._gameId));
     const startDate = new Date(this._gameId);
     this._scrollItem.querySelector(".panelGameStarted").innerText =
-      startDate.toISOString();
+      startDate.toLocaleString();
     this._scrollItem.querySelector(".panelTotalMoves").innerText = String(
       this._move
     );
