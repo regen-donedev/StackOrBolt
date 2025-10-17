@@ -112,11 +112,10 @@ function createBoard(domBoard) {
   svg1.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   svg1.setAttribute("viewBox", "0 0 100 100");
   svg1.classList.add(
-    "fillColorUser",
-    "fillColorBot",
+    "fillColorUser2",
+    "fillColorBot2",
     "fillColorDot",
-    "strokeColor",
-    "svgShadowTransition"
+    "strokeColor"
   );
   const use1 = document.createElementNS("http://www.w3.org/2000/svg", "use");
   use1.setAttribute("href", "./images/pieces.svg#tower_none");
@@ -181,8 +180,8 @@ function createHistoryBoard(domBoardState) {
   svg1.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   svg1.setAttribute("viewBox", "0 0 100 100");
   svg1.classList.add(
-    "fillColorUser",
-    "fillColorBot",
+    "fillColorUser2",
+    "fillColorBot2",
     "fillColorDot",
     "strokeColor"
   );

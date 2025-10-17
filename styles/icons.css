@@ -30,6 +30,14 @@
 .fillColorDot {
   fill: light-dark(var(--light-dot-color), var(--dark-dot-color));
 }
+.fillColorUser2 {
+  fill: light-dark(var(--light-user-color2), var(--dark-user-color2));
+  fill-opacity: 1;
+}
+.fillColorBot2 {
+  fill: light-dark(var(--light-bot-color2), var(--dark-bot-color2));
+  fill-opacity: 1;
+}
 .svgHide {
   display: none;
 }

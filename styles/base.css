@@ -7,23 +7,25 @@
     color-scheme: light;
   }
   /* ********************************** */
-  /* sizes for text-scaling             */
+  /* Sizes for text scaling. These      */
+  /* variable values will be changed    */
+  /* inside DOMContentLoaded callback   */
+  /* using clamp() arithmetics.         */
+  /* ---------------------------------- */
   /*  xl: 1000px < vmin                 */
-  /*   l:  800px < vmin < 1000px        */
-  /*   m:  600px < vmin <  800px        */
-  /*   s:          vmin <  600px        */
+  /*   l:          vmin <= 1000px       */
+  /*   m:          vmin <=  800px       */
+  /*   s:          vmin <=  600px       */
   /* ********************************** */
-  /* --text-size-xl: clamp(1.5rem, 0.5rem + 1.6vmin, 2rem);
-  --text-size-l: clamp(0.8rem, -2rem + 5.6vmin, 1.5rem);
-  --text-size-m: clamp(0.5rem, -0.7rem + 3.2vmin, 0.9rem);
-  --text-size-s: clamp(0.2rem, -0.1rem + 1.6vmin, 0.5rem); */
   --text-size-xl: 2rem;
   --text-size-l: 2rem;
   --text-size-m: 0.9rem;
   --text-size-s: 0.3rem;
   --dark-bg-color: #2e2e2e;
   --dark-bot-color: #fb8c00;
+  --dark-bot-color2: #fb8c00;
   --dark-user-color: #ec407a;
+  --dark-user-color2: #ec407a;
   --dark-dot-color: #2e2e2e;
   --dark-tile-color1: #90a4ae;
   --dark-tile-color2: #616161;
@@ -33,7 +35,9 @@
   --dark-boardCell-select: #6773e4;
   --light-bg-color: #f6ddbb;
   --light-bot-color: blue;
+  --light-bot-color2: blue;
   --light-user-color: red;
+  --light-user-color2: red;
   --light-dot-color: black;
   --light-tile-color1: #d5d1ae;
   --light-tile-color2: #a69c6f;
