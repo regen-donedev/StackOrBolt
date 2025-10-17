@@ -51,13 +51,13 @@ import {
   dialogSelectBtnEventHandler,
   dialogReplayCommitEventHandler,
   dialogNoHistoryDataBtnEventHandler,
+  dialogNoDataCommitBtnEventHandler,
 } from "./modules/ReplayHistoryEventLoop.js";
 
 let TEXT_FITTING = Object.freeze({
-  xl: { MIN_VMIN: 1000, MIN_FONT: 1.8, MAX_VMIN: 1500, MAX_FONT: 2.5 },
-  l: { MIN_VMIN: 800, MIN_FONT: 1.2, MAX_VMIN: 1000, MAX_FONT: 1.8 },
-  m: { MIN_VMIN: 600, MIN_FONT: 0.6, MAX_VMIN: 800, MAX_FONT: 0.9 },
-  s: { MIN_VMIN: 300, MIN_FONT: 0.4, MAX_VMIN: 600, MAX_FONT: 0.6 },
+  l: { MIN_VMIN: 800, MIN_FONT: 1.3, MAX_VMIN: 1500, MAX_FONT: 1.5 },
+  m: { MIN_VMIN: 600, MIN_FONT: 1.1, MAX_VMIN: 800, MAX_FONT: 1.3 },
+  s: { MIN_VMIN: 300, MIN_FONT: 0.6, MAX_VMIN: 600, MAX_FONT: 0.8 },
 });
 let aiWorker;
 let dbWorker;
@@ -738,27 +738,39 @@ async function initReplayLoggerEventHandlers() {
   if (!gameReplayScrollContainer) {
     throw new Error("cannot relocate scroll container for dialog element");
   }
-  const dialogConfirmContainerCommit = domReplayLogger.querySelector(
-    ".dialogReplayCommit .dialogConfirmContainer"
+  const dialogConfirmCancelCommit = domReplayLogger.querySelector(
+    ".dialogReplayCommit .dialogConfirmCancel"
   );
-  if (!dialogConfirmContainerCommit) {
+  if (!dialogConfirmCancelCommit) {
     throw new Error(
       "cannot relocate container element for replay commit confirmation"
     );
   }
-  dialogConfirmContainerCommit.addEventListener(
+  dialogConfirmCancelCommit.addEventListener(
     "click",
     dialogReplayCommitEventHandler
   );
-  const dialogConfirmContainerNoHistoryData = domReplayLogger.querySelector(
-    ".dialogUploadNoData .dialogConfirmContainer"
+  const dialogConfirmNoDataCommit = domReplayLogger.querySelector(
+    ".dialogReplayNoData .dialogConfirm"
   );
-  if (!dialogConfirmContainerNoHistoryData) {
+  if (!dialogConfirmNoDataCommit) {
+    throw new Error(
+      "cannot relocate container element for no commit data confirmation"
+    );
+  }
+  const dialogConfirmNoHistoryData = domReplayLogger.querySelector(
+    ".dialogUploadNoData .dialogConfirm"
+  );
+  if (!dialogConfirmNoHistoryData) {
     throw new Error(
       "cannot relocate container element for no game history data confirmation"
     );
   }
-  dialogConfirmContainerNoHistoryData.addEventListener(
+  dialogConfirmNoDataCommit.addEventListener(
+    "click",
+    dialogNoDataCommitBtnEventHandler
+  );
+  dialogConfirmNoHistoryData.addEventListener(
     "click",
     dialogNoHistoryDataBtnEventHandler
   );
@@ -766,8 +778,11 @@ async function initReplayLoggerEventHandlers() {
     try {
       const domReplayLogger = event.currentTarget;
       const icon = event.target.closest("svg");
+      if (!icon || !icon.classList.contains("icon2")) {
+        return;
+      }
       const gridItem = icon.closest("div");
-      if (!icon || !gridItem || !icon.classList.contains("icon2")) {
+      if (!gridItem) {
         return;
       }
       if (gridItem.classList.contains("footerReplayBackwardStep")) {
@@ -841,38 +856,41 @@ async function initReplayLoggerEventHandlers() {
           ".dialogReplayCommit"
         );
         if (!dialogReplayCommit) {
-          throw new Error("cannot relocate dialog element");
+          throw new Error("cannot relocate dialog element for replay commit");
         }
-        const iconCancel = dialogReplayCommit.querySelector(".iconCancel");
+        const dialogReplayNoData = gridItem.querySelector(
+          ".dialogReplayNoData"
+        );
+        if (!dialogReplayNoData) {
+          throw new Error("cannot relocate dialog element no data commit info");
+        }
         const lastBotMove = Number(
           dialogReplayCommit
-            .querySelector(".dialogConfirmContainer")
+            .querySelector(".dialogConfirmCancel")
             .getAttribute("data-last-bot-move")
         );
-        if (isNaN(lastBotMove) || !iconCancel) {
+        if (isNaN(lastBotMove)) {
           throw new Error(
             "cannot relocate last bot move attribute or cancel icon"
           );
         }
-        const dialogConfirmCaption = dialogConfirmContainerCommit.querySelector(
-          ".dialogConfirmCaption p"
-        );
-        if (!dialogConfirmCaption) {
+        const dialogConfirmCancelCaption =
+          dialogConfirmCancelCommit.querySelector(
+            ".dialogConfirmCancelCaption"
+          );
+        if (!dialogConfirmCancelCaption) {
           throw new Error(
             "cannot relocate caption element for replay commit dialog"
           );
         }
         if (isNaN(lastBotMove) || lastBotMove < 1) {
-          iconCancel.classList.add("svgHide");
-          dialogConfirmCaption.textContent =
-            "No game history for replay selected!";
+          dialogReplayNoData.showModal();
         } else {
-          iconCancel.classList.remove("svgHide");
-          dialogConfirmCaption.textContent = `Replay after bot move #${String(
+          dialogConfirmCancelCaption.textContent = `Replay after bot move #${String(
             lastBotMove
           )} ?`;
+          dialogReplayCommit.showModal();
         }
-        dialogReplayCommit.showModal();
       }
     } catch (error) {
       handleErrorEvent(error);

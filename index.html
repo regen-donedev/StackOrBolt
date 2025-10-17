@@ -251,8 +251,7 @@
         </div>
       </div>
       <dialog class="dialogAiWorkerTimeout">
-        <div class="dialogWorkerTimeoutContainer">
-          <div></div>
+        <div class="dialogConfirm">
           <div class="dialogConfirmCaption">
             The game was resetted due to a timeout condition in the AI worker
             thread. Increase the timeout value or decrease the search tree
@@ -278,11 +277,11 @@
           </div>
           <div>
             <dialog class="dialogSettingsSave">
-              <div class="dialogConfirmContainer">
-                <div class="dialogConfirmCaption">
-                  <p>Save current settings?</p>
+              <div class="dialogConfirmCancel">
+                <div class="dialogConfirmCancelCaption">
+                  Save current settings?
                 </div>
-                <div class="dialogConfirmUI">
+                <div class="dialogConfirmCancelUI">
                   <svg
                     class="icon2 iconConfirm"
                     xmlns="http://www.w3.org/2000/svg"
@@ -304,11 +303,11 @@
           </div>
           <div>
             <dialog class="dialogSettingsRecycle">
-              <div class="dialogConfirmContainer">
-                <div class="dialogConfirmCaption">
-                  <p>Restore all settings to factory default?</p>
+              <div class="dialogConfirmCancel">
+                <div class="dialogConfirmCancelCaption">
+                  Restore all settings to factory default?
                 </div>
-                <div class="dialogConfirmUI">
+                <div class="dialogConfirmCancelUI">
                   <svg
                     class="icon2 iconConfirm"
                     xmlns="http://www.w3.org/2000/svg"
@@ -667,9 +666,9 @@
               </main>
             </dialog>
             <dialog class="dialogUploadNoData">
-              <div class="dialogConfirmContainer">
+              <div class="dialogConfirm">
                 <div class="dialogConfirmCaption">
-                  <p>No game history found in database.</p>
+                  No game history found in database!
                 </div>
                 <div class="dialogConfirmUI">
                   <svg
@@ -677,12 +676,6 @@
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <use href="./images/icons.svg#icon_confirm"></use>
-                  </svg>
-                  <svg
-                    class="icon2 iconCancel svgHide"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <use href="./images/icons.svg#icon_cancel"></use>
                   </svg>
                 </div>
               </div>
@@ -710,11 +703,11 @@
               <use href="./images/icons.svg#icon_replay"></use>
             </svg>
             <dialog class="dialogReplayCommit">
-              <div class="dialogConfirmContainer" data-last-bot-move="">
-                <div class="dialogConfirmCaption">
-                  <p>Replay after bot move # ?</p>
+              <div class="dialogConfirmCancel" data-last-bot-move="">
+                <div class="dialogConfirmCancelCaption">
+                  Replay after bot move # ?
                 </div>
-                <div class="dialogConfirmUI">
+                <div class="dialogConfirmCancelUI">
                   <svg
                     class="icon2 iconConfirm"
                     xmlns="http://www.w3.org/2000/svg"
@@ -726,6 +719,21 @@
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <use href="./images/icons.svg#icon_cancel"></use>
+                  </svg>
+                </div>
+              </div>
+            </dialog>
+            <dialog class="dialogReplayNoData">
+              <div class="dialogConfirm">
+                <div class="dialogConfirmCaption">
+                  No game history for replay selected!
+                </div>
+                <div class="dialogConfirmUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
                   </svg>
                 </div>
               </div>

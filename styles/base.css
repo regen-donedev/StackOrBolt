@@ -12,12 +12,6 @@
   /* inside DOMContentLoaded callback   */
   /* using clamp() arithmetics.         */
   /* ---------------------------------- */
-  /*  xl: 1000px < vmin                 */
-  /*   l:          vmin <= 1000px       */
-  /*   m:          vmin <=  800px       */
-  /*   s:          vmin <=  600px       */
-  /* ********************************** */
-  --text-size-xl: 2rem;
   --text-size-l: 2rem;
   --text-size-m: 0.9rem;
   --text-size-s: 0.3rem;

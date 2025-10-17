@@ -196,9 +196,9 @@ function refreshSidebars(playerState) {
 
 function updateLastBotMove(moveNo, playerState) {
   const helperDiv = document.querySelector(
-    "#sectReplayLogger .dialogReplayCommit .dialogConfirmContainer"
+    "#sectReplayLogger .dialogReplayCommit .dialogConfirmCancel"
   );
-  const helperHeader = helperDiv.querySelector(".dialogConfirmCaption p");
+  const helperHeader = helperDiv.querySelector(".dialogConfirmCancelCaption");
   if (isNaN(moveNo) || moveNo <= 1) {
     helperDiv.setAttribute("data-last-bot-move", "");
     return;
@@ -287,21 +287,47 @@ async function dialogSelectBtnEventHandler(event) {
   }
 }
 
+async function dialogNoDataCommitBtnEventHandler(event) {
+  try {
+    const clickedIcon = event.target.closest("svg");
+    if (
+      !clickedIcon ||
+      !(clickedIcon instanceof SVGSVGElement) ||
+      !clickedIcon.classList.contains("iconConfirm")
+    ) {
+      return;
+    }
+    const dialog = event.target.closest(".dialogReplayNoData");
+    if (!dialog || !(dialog instanceof HTMLDialogElement)) {
+      return;
+    }
+    const container = dialog.querySelector(".dialogConfirm");
+    if (!container || !(container instanceof HTMLDivElement)) {
+      return;
+    }
+    dialog.close();
+  } catch (error) {
+    handleErrorEvent(error);
+    throw new Error(error);
+  }
+}
+
 async function dialogNoHistoryDataBtnEventHandler(event) {
   try {
     const clickedIcon = event.target.closest("svg");
-    if (!clickedIcon || !(clickedIcon instanceof SVGSVGElement)) {
+    if (
+      !clickedIcon ||
+      !(clickedIcon instanceof SVGSVGElement) ||
+      !clickedIcon.classList.contains("iconConfirm")
+    ) {
       return;
     }
     const dialog = event.target.closest(".dialogUploadNoData");
     if (!dialog || !(dialog instanceof HTMLDialogElement)) {
       return;
     }
-    const container = dialog.querySelector(".dialogConfirmContainer");
+    const container = dialog.querySelector(".dialogConfirm");
     if (!container || !(container instanceof HTMLDivElement)) {
-      return;
-    }
-    if (!clickedIcon.classList.contains("iconConfirm")) {
       return;
     }
     dialog.close();
@@ -321,7 +347,7 @@ async function dialogReplayCommitEventHandler(event) {
     if (!dialog || !(dialog instanceof HTMLDialogElement)) {
       return;
     }
-    const container = dialog.querySelector(".dialogConfirmContainer");
+    const container = dialog.querySelector(".dialogConfirmCancel");
     if (!container || !(container instanceof HTMLDivElement)) {
       return;
     }
@@ -361,4 +387,5 @@ export {
   dialogSelectBtnEventHandler,
   dialogReplayCommitEventHandler,
   dialogNoHistoryDataBtnEventHandler,
+  dialogNoDataCommitBtnEventHandler,
 };
