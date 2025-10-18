@@ -138,7 +138,7 @@ dialog {
         scroll-snap-align: center;
         width: inherit;
         height: inherit;
-        container-type: inline-size;
+        container-type: size;
         container-name: textFitter;
         contain: layout style paint;
         & .subgridHeader {
