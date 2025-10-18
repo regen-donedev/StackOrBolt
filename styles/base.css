@@ -6,15 +6,6 @@
   &:has(input[name="theme"][class="radioThemeLight"]:checked) {
     color-scheme: light;
   }
-  /* ********************************** */
-  /* Sizes for text scaling. These      */
-  /* variable values will be changed    */
-  /* inside DOMContentLoaded callback   */
-  /* using clamp() arithmetics.         */
-  /* ---------------------------------- */
-  --text-size-l: 2rem;
-  --text-size-m: 0.9rem;
-  --text-size-s: 0.3rem;
   --dark-bg-color: #2e2e2e;
   --dark-bot-color: #fb8c00;
   --dark-bot-color2: #fb8c00;
@@ -51,7 +42,6 @@ body {
   width: 100dvw;
   box-sizing: border-box;
   overflow: hidden;
-  font-size: var(--text-size-l);
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   overflow-wrap: break-word;

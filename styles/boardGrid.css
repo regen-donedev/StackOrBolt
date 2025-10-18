@@ -4,10 +4,8 @@
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(10, 1fr);
-  width: min(100vw, 100vh);
-  width: min(100dvw, 100dvh);
-  height: min(100vw, 100vh);
-  height: min(100dvw, 100dvh);
+  width: 100dvmin;
+  height: 100dvmin;
   & > * {
     background-color: transparent;
     position: relative;

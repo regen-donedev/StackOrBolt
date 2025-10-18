@@ -7,8 +7,8 @@ dialog {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(2, 1fr);
-    width: 80vmin;
-    height: 80vmin;
+    width: 80dvmin;
+    height: 80dvmin;
     align-items: center;
     justify-content: center;
     background-color: light-dark(
@@ -50,8 +50,8 @@ dialog {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(2, 1fr);
-    width: 80vmin;
-    height: 80vmin;
+    width: 80dvmin;
+    height: 80dvmin;
     align-items: center;
     justify-content: center;
     background-color: light-dark(
@@ -100,8 +100,8 @@ dialog {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      width: 80vmin;
-      height: 80vmin;
+      width: 80dvmin;
+      height: 80dvmin;
       background-color: light-dark(
         var(--light-tile-color1),
         var(--dark-tile-color1)
