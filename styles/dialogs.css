@@ -191,8 +191,8 @@ dialog {
           grid-template-rows: subgrid;
           align-items: center;
           justify-content: center;
-          gap: 0.5cqmin;
-          padding: 0.5cqmin;
+          /* gap: 0.5cqmin;
+          padding: 0.5cqmin; */
           & > div {
             display: grid;
             width: 100%;
