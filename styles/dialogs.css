@@ -140,6 +140,7 @@ dialog {
         height: inherit;
         container-type: inline-size;
         container-name: textFitter;
+        contain: layout style paint;
         & .subgridHeader {
           grid-row: 3 / 5;
           grid-column: 1 / 3;
