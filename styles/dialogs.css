@@ -134,20 +134,46 @@ dialog {
         display: grid;
         grid-template-columns: 1fr 2fr;
         grid-template-rows: repeat(8, 1fr);
-        margin: auto;
         scroll-snap-align: center;
         width: inherit;
         height: inherit;
-        container-type: size;
+        container-type: inline-size;
         container-name: textFitter;
-        contain: layout style paint;
+        & svg {
+          opacity: 1;
+          position: relative;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+        & .subgridUiIcons {
+          grid-row: 1 / 3;
+          grid-column: 1 / 3;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-template-rows: 1fr;
+          align-items: center;
+          justify-content: center;
+          background-color: light-dark(
+            var(--light-bg-color),
+            var(--dark-bg-color)
+          );
+          & .iconConfirm {
+            grid-column: 1 / 2;
+            grid-row: 1 / 1;
+          }
+          & .iconCancel {
+            grid-column: 2 / 3;
+            grid-row: 1 / 1;
+          }
+        }
         & .subgridHeader {
           grid-row: 3 / 5;
           grid-column: 1 / 3;
-          display: flex;
-          flex-direction: row;
+          display: grid;
           align-items: center;
-          justify-content: space-evenly;
+          justify-content: center;
           text-align: center;
           font-weight: bold;
           font-size: clamp(0.5rem, 4cqmin, 1.5rem);
@@ -156,23 +182,6 @@ dialog {
             var(--light-bg-color),
             var(--dark-bg-color)
           );
-        }
-        & .subgridUiIcons {
-          grid-row: 1 / 3;
-          grid-column: 1 / 3;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-evenly;
-          background-color: light-dark(
-            var(--light-bg-color),
-            var(--dark-bg-color)
-          );
-          & svg {
-            position: relative;
-            top: 0;
-            left: 0;
-          }
         }
         & .subgridGameIdItems {
           display: grid;
@@ -184,8 +193,6 @@ dialog {
           justify-content: center;
           gap: 0.5cqmin;
           padding: 0.5cqmin;
-          min-height: 1px;
-          transform: translateZ(0);
           & > div {
             display: grid;
             width: 100%;
