@@ -149,7 +149,7 @@ dialog {
           justify-content: space-evenly;
           text-align: center;
           font-weight: bold;
-          font-size: clamp(0.7rem, 5cqmin, 1.5rem);
+          font-size: clamp(0.5rem, 2cqmin, 1.5rem);
           overflow: scroll;
           background-color: light-dark(
             var(--light-bg-color),
@@ -197,7 +197,7 @@ dialog {
               var(--light-tile-color1),
               var(--dark-tile-color1)
             );
-            font-size: clamp(0.3rem, 0.3rem, 0.3rem);
+            font-size: clamp(0.5rem, 2cqmin, 1rem);
           }
           & div:nth-child(even) {
             background-color: light-dark(
