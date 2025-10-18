@@ -183,6 +183,8 @@ dialog {
           justify-content: center;
           gap: 0.5cqmin;
           padding: 0.5cqmin;
+          min-height: 1px;
+          transform: translateZ(0);
           & > div {
             display: grid;
             width: 100%;
@@ -192,7 +194,6 @@ dialog {
               var(--light-tile-color1),
               var(--dark-tile-color1)
             );
-            min-height: clamp(0.5rem, 4cqmin, 1.5rem);
             font-size: clamp(0.5rem, 4cqmin, 1.5rem);
           }
           & div:nth-child(even) {
