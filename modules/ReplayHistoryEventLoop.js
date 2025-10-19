@@ -16,6 +16,12 @@ const AUTOPLAY_SETTINGS = Object.freeze({
   TIMEOUT: 1700,
 });
 
+/**
+ * This is the main function for the game replay user interface frontend.
+ * It renders the new game state after clicking on the replay icons in the footer.
+ * @param {Number} advanceSteps
+ * @returns {Promise<void>}
+ */
 async function loadGameHistoryMove(advanceSteps) {
   await navigator.locks.request(
     "loadGameHistoryMove",
@@ -66,6 +72,11 @@ async function loadGameHistoryMove(advanceSteps) {
   );
 }
 
+/**
+ * This is just a helper function timeout function wrapper for the async/await pattern.
+ * @param {Number} timeout
+ * @returns {Promise<void>}
+ */
 async function waitForNextAutoPlay(timeout = AUTOPLAY_SETTINGS.TIMEOUT) {
   return new Promise((resolve, _) => {
     setTimeout(() => {
@@ -74,6 +85,11 @@ async function waitForNextAutoPlay(timeout = AUTOPLAY_SETTINGS.TIMEOUT) {
   });
 }
 
+/**
+ * This function handles the auto play loop.
+ * @param {LoggerReader} reader
+ * @returns {Promise<void>}
+ */
 async function autoPlayLongRunning(reader) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -91,6 +107,11 @@ async function autoPlayLongRunning(reader) {
   });
 }
 
+/**
+ * This function triggers the auto play loop and also dispatches
+ * the auto play termination event.
+ * @returns {Promise<void>}
+ */
 async function autoPlayManager() {
   const reader = LoggerReader.currentSelectedInstance;
   if (
@@ -107,6 +128,10 @@ async function autoPlayManager() {
   reader.eventTarget.dispatchEvent(new Event("autoplayterminate"));
 }
 
+/**
+ * This function awaits the auto play termination.
+ * @returns {Promise<void>}
+ */
 async function autoPlayTerminate() {
   await navigator.locks.request(
     "autoPlayTerminate",
@@ -128,6 +153,13 @@ async function autoPlayTerminate() {
   );
 }
 
+/**
+ * This function displays the game piece for a specific cell on the board.
+ * @param {HTMLDivElement} domEl
+ * @param {String[]} svgLayout
+ * @param {Boolean} dot
+ * @returns {void}
+ */
 function updateSvg(domEl, svgLayout, dot) {
   let svgLayoutString;
   if (svgLayout.length === 0) {
@@ -144,6 +176,11 @@ function updateSvg(domEl, svgLayout, dot) {
     .setAttribute("href", `./images/pieces.svg#${svgSymbol}`);
 }
 
+/**
+ * This function updates the current move number for this game in the dom.
+ * @param {Number} moveNo
+ * @returns {void}
+ */
 function prettifyMoveNumber(moveNo) {
   const hundreds = Math.floor(moveNo / 100);
   const tens = Math.floor((moveNo % 100) / 10);
@@ -159,6 +196,11 @@ function prettifyMoveNumber(moveNo) {
     .setAttribute("href", `./images/icons.svg#icon_digit_${ones}`);
 }
 
+/**
+ * This functions updates the current player state in the dom for the current replayed move.
+ * @param {PlayerState} playerState
+ * @returns {void}
+ */
 function refreshSidebars(playerState) {
   const logRecordDataUser = playerState._twoPlayer.find(
     (player, _) => player._id === PLAYER_ID.USER
@@ -194,11 +236,21 @@ function refreshSidebars(playerState) {
   }
 }
 
+/**
+ * This helper function maintains the data-property value for a container element
+ * inside the replay commitment dialog.
+ * This property value caches the last played bot move for restarting a new game from history.
+ * @param {Number} moveNo
+ * @param {PlayerState} playerState
+ * @returns {void}
+ */
 function updateLastBotMove(moveNo, playerState) {
   const helperDiv = document.querySelector(
-    "#sectReplayLogger .dialogReplayCommit .dialogConfirmCancel"
+    "#sectReplayLogger .dialogReplayCommit .containerConfirmCancel"
   );
-  const helperHeader = helperDiv.querySelector(".dialogConfirmCancelCaption");
+  const helperHeader = helperDiv.querySelector(
+    ".containerConfirmCancelCaption"
+  );
   if (isNaN(moveNo) || moveNo <= 1) {
     helperDiv.setAttribute("data-last-bot-move", "");
     return;
@@ -213,6 +265,13 @@ function updateLastBotMove(moveNo, playerState) {
   helperDiv.setAttribute("data-last-bot-move", String(moveNo));
 }
 
+/**
+ * This helper function updates the current BoardState instance, in order
+ * to restart a new game after a specific move from the game history replay section.
+ * @param {Object} record
+ * @param {BoardState} domBoardState
+ * @returns {void}
+ */
 function replayToSelectedBoardState(record, domBoardState) {
   const newBoardState = BoardState.createFromStructuredClone(record.boardState);
   const newPlayerBot = newBoardState.playerState.twoPlayer.find(
@@ -249,7 +308,13 @@ function replayToSelectedBoardState(record, domBoardState) {
   });
 }
 
-async function dialogSelectBtnEventHandler(event) {
+/**
+ * This callback handles the click events for the confirm and cancel icons
+ * inside a specific snapped scroll item for game replay selection.
+ * @param {Event} event
+ * @returns {Promise<void>}
+ */
+async function dialogGameReplaySelectionHandler(event) {
   try {
     const confirmIcon = event.target.closest(".selectGameId");
     const cancelIcon = event.target.closest(".cancelGameDialog");
@@ -287,7 +352,13 @@ async function dialogSelectBtnEventHandler(event) {
   }
 }
 
-async function dialogNoDataCommitBtnEventHandler(event) {
+/**
+ * This callback handles the click event for a confirm icon of a specific dialog,
+ * that opens only if there is no meaningful data to be replayed and restarted from.
+ * @param {Event} event
+ * @returns {Promise<void>}
+ */
+async function dialogInvalidStateForReplayHandler(event) {
   try {
     const clickedIcon = event.target.closest("svg");
     if (
@@ -301,7 +372,7 @@ async function dialogNoDataCommitBtnEventHandler(event) {
     if (!dialog || !(dialog instanceof HTMLDialogElement)) {
       return;
     }
-    const container = dialog.querySelector(".dialogConfirm");
+    const container = dialog.querySelector(".containerConfirmCancel");
     if (!container || !(container instanceof HTMLDivElement)) {
       return;
     }
@@ -312,7 +383,13 @@ async function dialogNoDataCommitBtnEventHandler(event) {
   }
 }
 
-async function dialogNoHistoryDataBtnEventHandler(event) {
+/**
+ * This callback handles the click event for a confirm icon of a specific dialog,
+ * that opens only if there is no logged game state data in the database at all.
+ * @param {Event} event
+ * @returns {Promise<void>}
+ */
+async function dialogNoHistoryDataFoundHandler(event) {
   try {
     const clickedIcon = event.target.closest("svg");
     if (
@@ -326,7 +403,7 @@ async function dialogNoHistoryDataBtnEventHandler(event) {
     if (!dialog || !(dialog instanceof HTMLDialogElement)) {
       return;
     }
-    const container = dialog.querySelector(".dialogConfirm");
+    const container = dialog.querySelector(".containerConfirmCancel");
     if (!container || !(container instanceof HTMLDivElement)) {
       return;
     }
@@ -337,7 +414,13 @@ async function dialogNoHistoryDataBtnEventHandler(event) {
   }
 }
 
-async function dialogReplayCommitEventHandler(event) {
+/**
+ * This callback handles the click events for a confirm and a cancel icon of a specific dialog,
+ * that opens for restarting a new game, beginning after this replayed game state.
+ * @param {Event} event
+ * @returns {Promise<void>}
+ */
+async function dialogReplayCurrentGameStateHandler(event) {
   try {
     const clickedIcon = event.target.closest("svg");
     if (!clickedIcon || !(clickedIcon instanceof SVGSVGElement)) {
@@ -347,7 +430,7 @@ async function dialogReplayCommitEventHandler(event) {
     if (!dialog || !(dialog instanceof HTMLDialogElement)) {
       return;
     }
-    const container = dialog.querySelector(".dialogConfirmCancel");
+    const container = dialog.querySelector(".containerConfirmCancel");
     if (!container || !(container instanceof HTMLDivElement)) {
       return;
     }
@@ -384,8 +467,8 @@ export {
   autoPlayTerminate,
   autoPlayManager,
   updateSvg,
-  dialogSelectBtnEventHandler,
-  dialogReplayCommitEventHandler,
-  dialogNoHistoryDataBtnEventHandler,
-  dialogNoDataCommitBtnEventHandler,
+  dialogGameReplaySelectionHandler,
+  dialogReplayCurrentGameStateHandler,
+  dialogNoHistoryDataFoundHandler,
+  dialogInvalidStateForReplayHandler,
 };

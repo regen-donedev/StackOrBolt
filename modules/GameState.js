@@ -7,7 +7,6 @@
  * Sidebar for visualizing each current player's state
  * and Move for representing and logging a move in the game.
  * @requires module:GameLogic
- * @requires module:types
  * @property {Object} PLAYER_ID - An immutable object containing primitive unique identifiers for both players.
  * @exports PLAYER_ID - An immutable object containing primitive unique identifiers for both players.
  * @exports GridCell - Represents a single cell in the game board, managing its state and DOM relation.
@@ -18,10 +17,13 @@
  * @exports Sidebar - Visualizing each player's state.
  */
 import { playMove, switchPlayer } from "./GameLogic.js";
-import { NEW_VAULT } from "./types.js";
 const PLAYER_ID = Object.freeze({
   USER: "user",
   BOT: "bot",
+});
+const NEW_VAULT = Object.freeze({
+  self: 0,
+  opponent: 0,
 });
 
 /**
@@ -631,7 +633,7 @@ class BoardState {
  * @property {boolean} turn - Indicates if it is currently this player's turn.
  * @property {boolean} lastHorizontal - Indicates if the player's last move was horizontal.
  * @property {number} safetyTower - Indicates the number of owning towers the player has brought back to safety.
- * @property {PlayerVault} vault - The vault object containing the player's and opponent's vault values.
+ * @property {Object} vault - The vault object containing the player's and opponent's vault values.
  * @property {boolean} winner - Player has won the game?
  *
  * @constructor
@@ -640,7 +642,7 @@ class BoardState {
  * @param {boolean} [turn=false] - Indicates if it is currently this player's turn.
  * @param {boolean} [lastHorizontal=false] - Indicates if the player's last move was horizontal.
  * @param {number} [safetyTower=0] - Indicates the number of owning towers the player has brought back to safety.
- * @param {PlayerVault} [vault={ ...NEW_VAULT }] - The vault object containing the player's and opponent's vault values.
+ * @param {Object} [vault={ ...NEW_VAULT }] - The vault object containing the player's and opponent's vault values.
  * @param {boolean} [winner=false]
  *
  * @throws {Error} Throws an error if the provided id is not a valid player identifier.
@@ -686,7 +688,7 @@ class Player {
   /**
    * The vault object containing the player's and opponent's vault values.
    * @private
-   * @type {PlayerVault}
+   * @type {Object}
    */
   _vault;
 
@@ -723,7 +725,7 @@ class Player {
    * @param {boolean} turn
    * @param {boolean} lastHorizontal
    * @param {number} safetyTower
-   * @param {PlayerVault} vault
+   * @param {Object} vault
    */
   constructor(
     id,
@@ -836,8 +838,8 @@ class Player {
    * Gets the player's vault. Holds the information of all conquered self and opponent stones
    * resulted from a specific movement and conquering of an opponent's tower.
    * @public
-   * @type {PlayerVault}
-   * @returns {PlayerVault}
+   * @type {Object}
+   * @returns {Object}
    * @readonly
    */
   get vault() {
@@ -848,7 +850,7 @@ class Player {
    * Sets the player's vault. Holds the information of all conquered self and opponent stones
    * resulted from a specific movement and conquering of an opponent's tower.
    * @public
-   * @param {PlayerVault} value
+   * @param {Object} value
    */
   set vault(value) {
     this._vault.self = Math.min(6, value.self);
@@ -1302,20 +1304,18 @@ class Sidebar {
   }
 
   /**
-   * Mark the active player's sidebar with a border.
+   * Mark the active player's sidebar with a hand pointer icon placed at the footer.
    *
    * @returns {void}
-   * @throws {Error} On ...
    */
   markDashboard() {
     this._handPointer.querySelector("svg").classList.remove("svgHide");
   }
 
   /**
-   * Unmark the active player's sidebar with a border.
+   * Unmark the active player's sidebar.
    *
    * @returns {void}
-   * @throws {Error} On ...
    */
   unmarkDashboard() {
     this._handPointer.querySelector("svg").classList.add("svgHide");
@@ -1325,7 +1325,6 @@ class Sidebar {
    * Updates the current player state in this html sidebar.
    *
    * @returns {void}
-   * @throws {Error} On ...
    */
   refreshDashboard() {
     this._vaultDigit
@@ -1357,12 +1356,10 @@ class Sidebar {
     }
 
     if (this._player.winner === true) {
-      //this._container.classList.add("winnerSidebar");
       this._horizontalMove.classList.add("winnerSidebar");
       this._safetyTile.classList.add("winnerSidebar");
       this._vaultTile.classList.add("winnerSidebar");
     } else {
-      //this._container.classList.remove("winnerSidebar");
       this._horizontalMove.classList.remove("winnerSidebar");
       this._safetyTile.classList.remove("winnerSidebar");
       this._vaultTile.classList.remove("winnerSidebar");

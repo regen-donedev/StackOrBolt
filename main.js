@@ -48,41 +48,19 @@ import {
   autoPlayTerminate,
   autoPlayManager,
   updateSvg,
-  dialogSelectBtnEventHandler,
-  dialogReplayCommitEventHandler,
-  dialogNoHistoryDataBtnEventHandler,
-  dialogNoDataCommitBtnEventHandler,
+  dialogGameReplaySelectionHandler,
+  dialogReplayCurrentGameStateHandler,
+  dialogNoHistoryDataFoundHandler,
+  dialogInvalidStateForReplayHandler,
 } from "./modules/ReplayHistoryEventLoop.js";
 
-let TEXT_FITTING = Object.freeze({
-  l: { MIN_VMIN: 800, MIN_FONT: 1.3, MAX_VMIN: 1500, MAX_FONT: 1.5 },
-  m: { MIN_VMIN: 600, MIN_FONT: 1.0, MAX_VMIN: 800, MAX_FONT: 1.2 },
-  s: { MIN_VMIN: 300, MIN_FONT: 0.5, MAX_VMIN: 600, MAX_FONT: 0.6 },
-});
 let aiWorker;
 let dbWorker;
 let isFatalError = false;
 
 /**
- * Computes the rem size in pixels (usually 16px).
- * @param {void}
- */
-function getRemSizeInPixels() {
-  // 1. Get the <html> element (the root of the document)
-  const rootElement = document.documentElement;
-
-  // 2. Use getComputedStyle to read the final, resolved 'font-size' property
-  const computedStyle = window.getComputedStyle(rootElement);
-
-  // 3. The value is returned as a string (e.g., "16px"). We parse it to a float.
-  const remSize = parseFloat(computedStyle.fontSize);
-
-  return remSize; // This will return 16 (or 10, or whatever it is set to)
-}
-
-/**
  * Force CSS color-scheme selection because of iOS user agent issues for imbedded svg shado root content.
- * @param {void}
+ * @returns {void}
  */
 function forceCSSColorSchemeSelection() {
   const radioThemeLight = document.querySelector(
@@ -460,6 +438,12 @@ function initRangeSlidersFromDb(settings, inputs, outputs) {
   });
 }
 
+/**
+ * Saves current configuration to the Settings object store in the database.
+ * @param {Array<HTMLInputElement>} domInputs - All html input range elements from the settings section
+ * @param {Settings} dbSettings - The current instance of class Settings reflecting the live configuration.
+ * @returns {void}
+ */
 async function saveCurrentSettings(domInputs, dbSettings) {
   const newWinningRules = structuredClone(Settings.factoryWinningRules);
   const newSearchRules = structuredClone(Settings.factorySearchRules);
@@ -664,6 +648,11 @@ function initSettingsEventHandlers(settings) {
   });
 }
 
+/**
+ * Loads the game history key data from the database and stores this meta information
+ * into the container items of the game replay dialog..
+ * @returns {void}
+ */
 async function loadReplayLogger() {
   const allIndexKeys = await cacheAllIndexKeys();
   if (allIndexKeys) {
@@ -693,28 +682,13 @@ async function loadReplayLogger() {
   }
 }
 
+/**
+ * Terminates and recreates the ai web worker thread on a timeout condition.
+ * @returns {void}
+ */
 function reCreateAiWorker() {
   aiWorker.terminate();
   aiWorker = new Worker("./modules/AiWorker.js", { type: "module" });
-}
-
-function togglePlayPauseIcon(
-  iconPlay = null,
-  iconPause = null,
-  togglePlay = true,
-  togglePause
-) {
-  if (iconPlay === null || iconPause === null) {
-    const domReplayLogger = document.querySelector("#sectReplayLogger");
-    iconPlay = domReplayLogger.querySelector(
-      ".footerReplayPlayPause .iconPlay"
-    );
-    iconPause = domReplayLogger.querySelector(
-      ".footerReplayPlayPause .iconPause"
-    );
-  }
-  iconPlay.classList.toggle("svgHide");
-  iconPause.classList.toggle("svgHide");
 }
 
 /**
@@ -728,6 +702,8 @@ function togglePlayPauseIcon(
  *   By clicking on the replay button on the top right, the current game is stopped and
  *   resetted and a new game is started at this specific user's move.
  * - By clicking on the upload button, a dialog is opened from where you can select another game history.
+ * - By clicking on the replay icon in the navigation bar, the current live gamestate will be resetted
+ *   and restored after the last forwarded bots move from the selected game history.
  * @returns {void}
  */
 async function initReplayLoggerEventHandlers() {
@@ -738,41 +714,41 @@ async function initReplayLoggerEventHandlers() {
   if (!gameReplayScrollContainer) {
     throw new Error("cannot relocate scroll container for dialog element");
   }
-  const dialogConfirmCancelCommit = domReplayLogger.querySelector(
-    ".dialogReplayCommit .dialogConfirmCancel"
+  const containerConfirmCancelCommit = domReplayLogger.querySelector(
+    ".dialogReplayCommit .containerConfirmCancel"
   );
-  if (!dialogConfirmCancelCommit) {
+  if (!containerConfirmCancelCommit) {
     throw new Error(
       "cannot relocate container element for replay commit confirmation"
     );
   }
-  dialogConfirmCancelCommit.addEventListener(
+  containerConfirmCancelCommit.addEventListener(
     "click",
-    dialogReplayCommitEventHandler
+    dialogReplayCurrentGameStateHandler
   );
-  const dialogConfirmNoDataCommit = domReplayLogger.querySelector(
-    ".dialogReplayNoData .dialogConfirm"
+  const containerConfirmNoDataCommit = domReplayLogger.querySelector(
+    ".dialogReplayNoData .containerConfirmCancel"
   );
-  if (!dialogConfirmNoDataCommit) {
+  if (!containerConfirmNoDataCommit) {
     throw new Error(
       "cannot relocate container element for no commit data confirmation"
     );
   }
-  const dialogConfirmNoHistoryData = domReplayLogger.querySelector(
-    ".dialogUploadNoData .dialogConfirm"
+  const containerConfirmNoHistoryData = domReplayLogger.querySelector(
+    ".dialogUploadNoData .containerConfirmCancel"
   );
-  if (!dialogConfirmNoHistoryData) {
+  if (!containerConfirmNoHistoryData) {
     throw new Error(
       "cannot relocate container element for no game history data confirmation"
     );
   }
-  dialogConfirmNoDataCommit.addEventListener(
+  containerConfirmNoDataCommit.addEventListener(
     "click",
-    dialogNoDataCommitBtnEventHandler
+    dialogInvalidStateForReplayHandler
   );
-  dialogConfirmNoHistoryData.addEventListener(
+  containerConfirmNoHistoryData.addEventListener(
     "click",
-    dialogNoHistoryDataBtnEventHandler
+    dialogNoHistoryDataFoundHandler
   );
   domReplayLogger.addEventListener("click", async (event) => {
     try {
@@ -866,7 +842,7 @@ async function initReplayLoggerEventHandlers() {
         }
         const lastBotMove = Number(
           dialogReplayCommit
-            .querySelector(".dialogConfirmCancel")
+            .querySelector(".containerConfirmCancel")
             .getAttribute("data-last-bot-move")
         );
         if (isNaN(lastBotMove)) {
@@ -874,11 +850,11 @@ async function initReplayLoggerEventHandlers() {
             "cannot relocate last bot move attribute or cancel icon"
           );
         }
-        const dialogConfirmCancelCaption =
-          dialogConfirmCancelCommit.querySelector(
-            ".dialogConfirmCancelCaption"
+        const containerConfirmCancelCaption =
+          containerConfirmCancelCommit.querySelector(
+            ".containerConfirmCancelCaption"
           );
-        if (!dialogConfirmCancelCaption) {
+        if (!containerConfirmCancelCaption) {
           throw new Error(
             "cannot relocate caption element for replay commit dialog"
           );
@@ -886,7 +862,7 @@ async function initReplayLoggerEventHandlers() {
         if (isNaN(lastBotMove) || lastBotMove < 1) {
           dialogReplayNoData.showModal();
         } else {
-          dialogConfirmCancelCaption.textContent = `Replay after bot move #${String(
+          containerConfirmCancelCaption.textContent = `Replay after bot move #${String(
             lastBotMove
           )} ?`;
           dialogReplayCommit.showModal();
@@ -899,32 +875,13 @@ async function initReplayLoggerEventHandlers() {
   });
   gameReplayScrollContainer.addEventListener(
     "click",
-    dialogSelectBtnEventHandler
+    dialogGameReplaySelectionHandler
   );
 }
 
-window.addEventListener("DOMContentLoaded", (_) => {
-  const root = document.documentElement;
-  const remInPx = getRemSizeInPixels();
-  for (const [key, value] of Object.entries(TEXT_FITTING)) {
-    const cssVariableName = `--text-size-${key}`;
-    const minFontRem = value["MIN_FONT"];
-    const maxFontRem = value["MAX_FONT"];
-    const minVminPx = value["MIN_VMIN"];
-    const maxVminPx = value["MAX_VMIN"];
-    let slope = ((maxFontRem - minFontRem) * remInPx) / (maxVminPx - minVminPx);
-    slope = Math.trunc(slope * 100) / 100;
-    let yIntercept = minFontRem * remInPx - slope * minVminPx;
-    const yInterceptRem = Math.trunc((yIntercept / remInPx) * 100) / 100;
-    const cssVariableValue = `clamp(${minFontRem}rem, ${yInterceptRem}rem + ${
-      slope * 100
-    }vmin, ${maxFontRem}rem)`;
-    root.style.setProperty(cssVariableName, cssVariableValue);
-  }
-});
-
 /**
  * Main entry point for the game.
+ * @returns {void}
  */
 window.addEventListener("load", async (_) => {
   try {
@@ -1007,6 +964,11 @@ window.addEventListener("load", async (_) => {
     throw new Error(error);
   }
 });
+
+/**
+ * Centralized error event handling in the main thread for unhandled or rethrown error events.
+ * @returns {void}
+ */
 window.addEventListener("error", (errorEvent) => {
   errorEvent.stopImmediatePropagation();
   isFatalError = true;
@@ -1019,6 +981,11 @@ window.addEventListener("error", (errorEvent) => {
     aiWorker.terminate();
   }
 });
+
+/**
+ * Centralized event handling in the main thread for unhandled promise rejections.
+ * @returns {void}
+ */
 window.addEventListener("unhandledrejection", (event) => {
   const error = event.reason;
   console.error("--- Unhandled Promise Rejection Detected ---");

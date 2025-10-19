@@ -145,7 +145,7 @@ function getLocalMoves(cellInst, player, boardState) {
  *
  * @param {BoardState} boardState - The current BoardState of the game.
  * @param {Player} player - The Player for whom to generate possible moves.
- * @returns {MoveSpace} An array of moves, where each move consists of a source cell and a target cell.
+ * @returns {GridCell[][]} An array of moves, where each move consists of a source cell and a target cell.
  */
 function getAllPossibleMoves(boardState, player) {
   const allPossibleMoves = [];

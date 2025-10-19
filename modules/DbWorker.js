@@ -17,6 +17,14 @@ let db = null;
 const dbVersion = 29;
 let initFromScratch = false;
 
+/**
+ * Returns all game identifier index keys from the replayLogger object store,
+ * which represent the unique Date() timestamp for a game.
+ * @param {String} objStoreName
+ * @param {String} indexName
+ * @param {Number} indexKey
+ * @returns {Number[]} - An array of game identifiers
+ */
 async function getKeysFromIndexOnly(objStoreName, indexName, indexKey) {
   return new Promise((resolve, reject) => {
     try {
@@ -48,6 +56,13 @@ async function getKeysFromIndexOnly(objStoreName, indexName, indexKey) {
   });
 }
 
+/**
+ * Returns all primary keys for a given game identifier Date() timestamp,
+ * where each primary key points to the logged record for a specific move on the board.
+ * @param {String} objStoreName
+ * @param {String} indexName
+ * @returns {Object[]}
+ */
 async function getAllIndexKeys(objStoreName, indexName) {
   return new Promise((resolve, reject) => {
     try {
@@ -86,6 +101,13 @@ async function getAllIndexKeys(objStoreName, indexName) {
   });
 }
 
+/**
+ * Commits a transaction for a specific objectstore.
+ * @param {String} objStoreName
+ * @param {String} method
+ * @param {*} parm
+ * @returns {Promise<Object>}
+ */
 async function storeXact(objStoreName, method, parm = null) {
   return new Promise((resolve, reject) => {
     try {
@@ -131,6 +153,10 @@ async function storeXact(objStoreName, method, parm = null) {
   });
 }
 
+/**
+ * opens the IndexedDB database
+ * @returns {Promise<Object>}
+ */
 async function openDb() {
   return new Promise((resolve, reject) => {
     try {
@@ -171,6 +197,10 @@ async function openDb() {
   });
 }
 
+/**
+ * Creates a new indexDB database, if appropriate, and opens it.
+ * @returns {Promise<void>}
+ */
 async function open() {
   if (idbFactory === null) {
     throw new Error(
@@ -204,6 +234,10 @@ async function open() {
   }
 }
 
+/**
+ * Handles all message events from the main thread.
+ * @returns {Promise<void>}
+ */
 self.addEventListener("message", async (event) => {
   try {
     const response = structuredClone(event.data);
@@ -277,6 +311,10 @@ self.addEventListener("message", async (event) => {
   }
 });
 
+/**
+ * Handles unhandled error events in this web worker thread
+ * @returns {void}
+ */
 self.addEventListener("error", (event) => {
   handleErrorEvent(error);
   handleErrorEvent(new Error("Uncaught error in DbWorker"));

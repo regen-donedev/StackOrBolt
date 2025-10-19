@@ -126,7 +126,6 @@ class Settings {
    * Creates a new Settings instance.
    * @constructor
    * @param {Worker} dbWorker - The Web Worker instance handling IndexedDB database operations
-   * @throws {TypeError}
    */
   constructor(dbWorker) {
     this._dbWorker = dbWorker;
@@ -209,6 +208,7 @@ class Settings {
    * @public
    * @type {Object}
    * @param {Object}
+   * @throws {Error}
    */
   set winningRules(value) {
     if (!value.id || !value.settings || value.id !== "WinningRules") {
@@ -227,6 +227,7 @@ class Settings {
    * @public
    * @type {Object}
    * @param {Object}
+   * @throws {Error}
    */
   set searchRules(value) {
     if (!value.id || !value.settings || value.id !== "SearchRules") {
@@ -251,6 +252,7 @@ class Settings {
    * @public
    * @type {Object}
    * @param {Object}
+   * @throws {Error}
    */
   set materialAdvantageConquered(value) {
     if (
@@ -279,6 +281,7 @@ class Settings {
    * @public
    * @type {Object}
    * @param {Object}
+   * @throws {Error}
    */
   set safetyZoneProximity(value) {
     if (!value.id || !value.settings || value.id !== "SafetyZoneProximity") {
@@ -303,6 +306,7 @@ class Settings {
    * @public
    * @type {Object}
    * @param {Object}
+   * @throws {Error}
    */
   set materialAdvantageAccounted(value) {
     if (

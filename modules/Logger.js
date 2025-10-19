@@ -1,6 +1,7 @@
 /**
  * @module Logger
- * @description ToDo...
+ * @description This module exports the LoggerWirter and LoggerReader classes,
+ * which are essential for logging and fetching historic game moves from the database.
  * @requires module:AsyncAPIWrapper
  * @requires module:GameState
  * @exports LoggerWriter
@@ -20,6 +21,11 @@ const LOGGER_DB_ITEMS = Object.freeze({
   INDEX_NAME: "gameId",
 });
 
+/**
+ * This helper functions is necessary to maintain high level meta informations
+ * for the last 10 games.
+ * @returns {Promise<Object>}
+ */
 async function cacheAllIndexKeys() {
   const request = structuredClone(workerMessageScheme);
   request.request.type = "getAllIndexKeys";
@@ -30,6 +36,15 @@ async function cacheAllIndexKeys() {
   return workerResponse.response.message;
 }
 
+/**
+ * This helper function is necessary to maintain database information for
+ * the last 10 games.
+ * Based on these cached primary keys, obsolete records will be deleted from the databse
+ * and active records can be dynamically fetched by using the replay icons (backward/play/pause/forward)
+ * on the footer.
+ * @param {Number} indexKey - The game identifier timestamp
+ * @returns
+ */
 async function cacheKeysFromIndex(indexKey) {
   const request = structuredClone(workerMessageScheme);
   request.request.type = "getKeysFromIndexOnly";
@@ -42,10 +57,15 @@ async function cacheKeysFromIndex(indexKey) {
 }
 
 /**
- * ToDo...
+ * Log each new game move to the database, maintain the wraparound tables for
+ * the last 10 games, manage new LoggerReader instances created after the first move on a new game.
  *
  * @class
+ * @property {BoardState} boardState
+ * @property {Number} gameid
+ * @property {Move} move
  * @constructor
+ * @param {BoardState} boardState
  */
 class LoggerWriter {
   /**
@@ -152,6 +172,10 @@ class LoggerWriter {
     this._gameId = value;
   }
 
+  /**
+   * Logs the initial boardstate before the first user's move.
+   * @returns {Promise<void>}
+   */
   async #firstUpdate() {
     const key = Date.now();
     const record = {
@@ -175,7 +199,6 @@ class LoggerWriter {
    * @public
    * @param {Move} - the last applied move.
    * @returns {Promise<void>}
-   * @readonly
    */
   async update(lastMove) {
     if (this._move === 0) {
@@ -236,10 +259,27 @@ class LoggerWriter {
 }
 
 /**
- * ToDo...
- *
+ * Holds high level meta information for a game and caches all primary keys
+ * related to a specific game state.
+ * Contains cursor management functionality
+ * for fetching the next game state record from the database, based on dom user interactions.
  * @class
+ * @property {Number} gameid
+ * @property {Number[]} primaryKeys
+ * @property {AsyncGenerator} generator - This async generator function emulates a database cursor state
+ *                                        by yielding and managing the index value for all cached primary keys.
+ * @property {String} winner
+ * @property {Number} move
+ * @property {HTMLDivElement} scrollItem - A CSS scroll container item containing high level
+ *                                         text content for this game.
+ *                                         This element is contained inside the game history selection dialog,
+ *                                         opened by clicking on the upload icon in the navigation bar.
+ * @property {Boolean} autoPlayActive - Returns true if auto replay is active, i.e. if the play icon was clicked.
+ * @property {EventTarget} eventTarget - A new custom event will be dispatched on this helper property,
+ *                                       in order to terminate the auto play mode in a synchronous manner.
+ *
  * @constructor
+ * @param {Number} gameid
  */
 class LoggerReader {
   /**
@@ -258,7 +298,7 @@ class LoggerReader {
 
   /**
    * This AsyncGenerator function object acts as a pseudo db cursor state manager, because it
-   * emulates the advance() methid of the IDBCursor interface.
+   * emulates the advance() method of the IDBCursor interface.
    * The number of steps to advance is yielded and the
    * index of the primaryKeys array is updated, before the next
    * record from the object store is fetched.
@@ -490,6 +530,11 @@ class LoggerReader {
     return this._scrollItem;
   }
 
+  /**
+   * updates the css scroll container item text content, containing the high level meta
+   * information for this game.
+   * @returns {void}
+   */
   updateScrollItemElements() {
     this._scrollItem.setAttribute("data-db-key", String(this._gameId));
     const startDate = new Date(this._gameId);
@@ -505,10 +550,20 @@ class LoggerReader {
       this._winner === "none" ? "ongoing" : "finished";
   }
 
+  /**
+   * Adds a new primary key whenever a new move is played on the dom live game, or
+   * at initial page load when creating the LoggerReader instances from database records.
+   * @param {Number} key
+   * @returns {void}
+   */
   addPrimaryKey(key) {
     this._primaryKeys.push(key);
   }
 
+  /**
+   * Initializes new AsyncGenerator property of this instance.
+   * @returns {AsyncGenerator}
+   */
   async *generatorFactory() {
     if (this.primaryKeys.length === 0) {
       return;
@@ -560,6 +615,11 @@ class LoggerReader {
     }
   }
 
+  /**
+   * Returns the next database record for the inquired game state.
+   * @param {Number} advanceSteps
+   * @returns {Promise<Object>}
+   */
   async fetchRecord(advanceSteps) {
     const result = await this._generator.next(advanceSteps);
     if (result.done === true) {

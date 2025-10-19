@@ -122,6 +122,15 @@ function discardBoardAnimations() {
   });
 }
 
+/**
+ * This function handles the new user move in the live game.
+ * @param {BoardState} domBoardState
+ * @param {Settings} settings
+ * @param {Worker} aiWorker
+ * @param {LoggerWriter} loggerWriter
+ * @param {GridCell} clickedCell
+ * @returns {Promise<void>}
+ */
 async function playUserMove(
   domBoardState,
   settings,
@@ -166,6 +175,15 @@ async function playUserMove(
   }
 }
 
+/**
+ * This function communicates with the ai worker thread
+ * using event based messaging for finding the next best move.
+ * @param {BoardState} domBoardState
+ * @param {Settings} settings
+ * @param {Worker} aiWorker
+ * @param {LoggerWriter} loggerWriter
+ * @returns {Promise<void>}
+ */
 async function playBotMove(domBoardState, settings, aiWorker, loggerWriter) {
   //animate css load spinner
   const spinner1 = document.querySelector(".spinner1");

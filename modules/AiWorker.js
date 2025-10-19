@@ -18,6 +18,10 @@ import { BoardState } from "./GameState.js";
 import { findBestMove } from "./MinimaxAB.js";
 import { workerMessageScheme } from "./AsyncAPIWrapper.js";
 
+/**
+ * Handles all message events from the main thread
+ * @returns {void}
+ */
 self.addEventListener("message", (event) => {
   try {
     if (event.data.request.type === "findBestMove") {
@@ -42,6 +46,10 @@ self.addEventListener("message", (event) => {
   }
 });
 
+/**
+ * Handles unhandled error events in this web worker thread
+ * @returns {void}
+ */
 self.addEventListener("error", (event) => {
   handleErrorEvent(error);
   handleErrorEvent(new Error("Uncaught error in AiWorker"));

@@ -2,8 +2,8 @@
  * @module AsnycAPIWrapper
  * @description This module provides an Async/Await Wrapper API for the following tasks:
  *                - Event-based messaging between the main thread and a Web Worker instance.
- *                - Triggering and waiting for sispatched CSS transition events.
- * @exports dispatchWorker
+ *                - Triggering and waiting for dispatched CSS transition events.
+ *                - Event Listener handling for custom dispatched events in the main thread.
  */
 
 const workerMessageScheme = Object.freeze({
@@ -13,6 +13,11 @@ const workerMessageScheme = Object.freeze({
 
 const defaultTimeout = 5000;
 
+/**
+ * Validates the object sent back from the web worker thread.
+ * @param {Object} object
+ * @returns {boolean}
+ */
 function messageSchemeComparator(object) {
   const keys1 = Object.keys(workerMessageScheme).sort();
   const keys2 = Object.keys(object).sort();
@@ -37,6 +42,12 @@ function messageSchemeComparator(object) {
   return true;
 }
 
+/**
+ * Throws an error if the posted message object from a web worker is invalid.
+ * @param {Object} respMsg
+ * @returns {void}
+ * @throws {ErrorEvent}
+ */
 function handleResponse(respMsg) {
   if (!messageSchemeComparator(respMsg)) {
     throw new Error("Uncaught error from db worker: " + respMsg.toString());
@@ -46,6 +57,13 @@ function handleResponse(respMsg) {
   }
 }
 
+/**
+ * Handles the event messaging interface between main thread and web worker.
+ * @param {Worker} worker
+ * @param {Object} message
+ * @param {Number} timeout
+ * @returns
+ */
 async function dispatchWorker(worker, message, timeout = defaultTimeout) {
   const workerPromise = new Promise((resolve, reject) => {
     try {
@@ -93,6 +111,14 @@ async function dispatchWorker(worker, message, timeout = defaultTimeout) {
   return Promise.race([workerPromise, timeoutPromise]);
 }
 
+/**
+ * This function resolves the returned promise,
+ * if the background-color transition of a div element has ended.
+ * @param {HTMLDivElement} domElement
+ * @param {String} cssClass
+ * @param {Number} timeout
+ * @returns {Promise<Object>}
+ */
 async function cssTransitionEnded(
   domElement,
   cssClass,
@@ -149,6 +175,12 @@ async function cssTransitionEnded(
   return Promise.race([cssTransitionPromise, timeoutPromise]);
 }
 
+/**
+ * This function resolves, if a new custom event
+ * gets dipatched for a LoggerReader EventTarget instance.
+ * @param {LoggerReader} reader
+ * @returns {Promise<void>}
+ */
 async function autoPlayTerminated(reader) {
   return new Promise((resolve, reject) => {
     try {
