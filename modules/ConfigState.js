@@ -96,6 +96,7 @@ class Settings {
       weightRowDistance3: 8,
       weightRowDistance4: 7,
       weightRowDistance5: 7,
+      safetyZoneTotalDistance: 1,
       opponentWeight: 2.0,
       totalWeight: 10,
     },
@@ -294,7 +295,7 @@ class Settings {
     values.forEach((val, index) => {
       if (isNaN(val)) {
         throw new Error(
-          "Class Settings: Invalid value for setter4: " + String(val)
+          "Class Settings: Invalid value for setter: " + String(val)
         );
       }
       this._safetyZoneProximity.settings[keys[index]] = val;

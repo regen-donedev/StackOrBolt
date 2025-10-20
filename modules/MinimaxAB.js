@@ -41,6 +41,8 @@ function getTerminalNodeState(boardState, depth) {
     let userTowers = 0;
     let botTowerSafetyWeight = 0;
     let userTowerSafetyWeight = 0;
+    let botTowerTotalSafetyDistance = 0;
+    let userTowerTotalSafetyDistance = 0;
     let score = 0;
     boardState.cells.forEach((cell) => {
       if (cell.svgLayout.at(-1) === playerBot.id) {
@@ -50,6 +52,7 @@ function getTerminalNodeState(boardState, depth) {
           cell.dot === true
         ) {
           const rowDistance = 5 - cell.row;
+          botTowerTotalSafetyDistance += rowDistance;
           switch (rowDistance) {
             case 1:
               botTowerSafetyWeight +=
@@ -88,6 +91,7 @@ function getTerminalNodeState(boardState, depth) {
           cell.dot === true
         ) {
           const rowDistance = cell.row;
+          userTowerTotalSafetyDistance += rowDistance;
           switch (rowDistance) {
             case 1:
               userTowerSafetyWeight +=
@@ -134,6 +138,11 @@ function getTerminalNodeState(boardState, depth) {
             userTowerSafetyWeight) *
           cachedSettingsState.safetyZoneProximity.settings.totalWeight
       );
+      score +=
+        (userTowerTotalSafetyDistance - botTowerTotalSafetyDistance) *
+        cachedSettingsState.safetyZoneProximity.settings
+          .safetyZoneTotalDistance *
+        cachedSettingsState.safetyZoneProximity.settings.totalWeight;
     }
     // Increase the heuristic score for Accounted Material Advantage
     // by applying the final weight for the total difference.

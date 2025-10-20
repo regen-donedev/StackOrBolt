@@ -54,6 +54,7 @@ A configuration change for the winning rules may necessitate such customizations
 - **Positional advantage:** Apply a weight to the difference of the
   total distance between both players for all towers in reverse movement. Even if one player has only
   one tower left, a win might still be possible by reaching the safety zone first.
+  This weight gets accounted for a player only if all owning pieces are already in reverse movement.
 - **Defensive factor:** The opponent player may get a higher score on equal
   conditions, this could prevent a positional advantage.
 

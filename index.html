@@ -375,8 +375,8 @@
               A higher value for the opponent weight factor yields to a more
               defensive strategy.
               <br />
-              Subsequently, the total difference of these summed weights gets
-              multiplicated with the total weight factor.
+              The total difference of these summed weights gets multiplicated
+              with the total weight factor.
               <br />
               <br />
             </p>
@@ -567,6 +567,22 @@
           </div>
         </form>
         <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZoneTotalDistanceWeight"
+                >total distance to safety zone:</label
+              >
+              <input
+                type="range"
+                id="safetyZoneTotalDistanceWeight"
+                name="safetyZoneTotalDistanceWeight"
+                min="0"
+                max="10"
+                step="1"
+              />
+            </fieldset>
+            <output for="safetyZoneTotalDistanceWeight"></output>
+          </div>
           <div class="slider">
             <fieldset>
               <label for="safetyZoneOpponentWeight">opponent weight:</label>
