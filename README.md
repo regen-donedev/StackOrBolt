@@ -1,7 +1,12 @@
+## StackOrBolt
+
 A classic two player board game with an ai opponent.
 Move a piece one or two cells forward or sideward.
 You can wrapaound the board for sideward moves,
 but two consecutive sideward moves are not allowed.
+
+<img src="./images/intro1.png" height="200"/>
+
 To conquer the opponent material, simply stack your
 piece above the opponent's and its yours (for now).
 Stacked pieces or "towers" are limited to three stones in total.
