@@ -30,7 +30,7 @@ the player has successfully secured it and it will be removed from the board.
 
 ## Game End
 
-The game ends if a player has conquered all opponent pieces 
+The game ends if a player has conquered all opponent pieces
 or secured all of his own.
 
 ### Additional distinct winning rules by default
@@ -42,7 +42,7 @@ or secured all of his own.
 
 ## Settings
 
-The heuristic score algorithm for the Alpha-beta pruning evaluation function 
+The heuristic score algorithm for the Alpha-beta pruning evaluation function
 can be optimized by adjusting the weights for the following strategies.
 A configuration change for the winning rules may necessitate such customizations.
 
@@ -52,7 +52,7 @@ A configuration change for the winning rules may necessitate such customizations
   depending on the distance (number of cells left) to reach the safety zone.
   More towers in reverse movement or a lesser distance may yield to a higher score.
 - **Positional advantage:** Apply a weight to the difference of the
-  total distance between both players for all towers in reverse movement. Even if one player has only 
+  total distance between both players for all towers in reverse movement. Even if one player has only
   one tower left, a win might still be possible by reaching the safety zone first.
 - **Defensive factor:** The opponent player may get a higher score on equal
   conditions, this could prevent a positional advantage.
@@ -66,7 +66,7 @@ A configuration change for the winning rules may necessitate such customizations
   where the stack size limit exceeds, the removed opponent stones are
   credited to the player's own vault.
   Apply a total weight to the difference of all
-  credited conquered opponent stonens in the vault for both players. 
+  credited conquered opponent stones in the vault for both players.
   This could potentially yield to an early winning situation.
 
 ## Game replay
@@ -77,4 +77,3 @@ You can upload an old game and replay after a specific move.
 <img src="./images/intro5.png" height="200"/>
 
 <img src="./images/intro6.png" height="200"/>
-
