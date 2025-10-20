@@ -67,7 +67,7 @@ A configuration change for the winning rules may necessitate such customizations
   credited to the player's own vault.
   Apply a total weight to the difference of all
   credited conquered opponent stones in the vault for both players.
-  This could potentially yield to an early winning situation.
+  This could potentially yield to an earlier winning situation.
 
 ## Game replay
 
