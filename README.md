@@ -2,7 +2,7 @@
 
 A classic two player board game with an ai opponent.
 
-<h1><a href="https://regen-donedev.github.io/StackOrBolt/">Play online on github pages</a></h1>
+<h1><a href="https://regen-donedev.github.io/StackOrBolt/" target="_blank" rel="noopener noreferrer">Play online on github pages</a></h1>
 
 ## Game Rules
 
