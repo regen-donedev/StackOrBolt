@@ -5,37 +5,39 @@ A classic two player board game with an ai opponent.
 
 ## Game Rules
 
-Move a piece one or two cells forward or sideward.
+Move a piece one or two cells forward or sideward
+onton an empty cell or opponent's piece.
 You can wraparound the board for sideward moves,
 but two consecutive sideward moves are not allowed.
 
 <img src="./images/intro1.png" height="200"/>
 
 To conquer opponent material, simply stack your
-piece above the opponent's and its yours (for now).
+piece on top of the opponent's and its yours to own (for now).
 
 <img src="./images/intro2.png" height="100"/>
 
-By default, stacked pieces or **"towers"** are limited to three stones in total.
-If the max stack size exceeds, all obsolete stones
+Single stones or stacked pieces are called **"towers"**
+which are limited to three stones in total by default.
+If the max stack size exceeds for a move, all obsolete stones
 are removed from the board in a FIFO manner and the opponent's will be  
 credited to the player's vault.  
-All stones for a tower are glued persistently and regarded as one single piece.
-When a piece (tower or single stone) reaches the opposite side of the board,
-its vertical movement is reversed (it begins moving backward).
-If that piece reaches the end of the board again, **the safety zone**,
+All stones for a tower are coupled to it and regarded as one single piece.
+When a tower reaches the opposite side of the board,
+its vertical movement is reversed (visually indicated by a dot marker).
+If that tower reaches the end of the board again, **the safety zone**,
 the player has successfully secured it and it will be removed from the board.
 
 <img src="./images/intro3.png" height="200"/>
 
 ## Game End
 
-The game ends if a player has conquered all opponent pieces
+The game ends if a player has conquered all opponent towers
 or secured all of his own.
 
 ### Additional distinct winning rules by default
 
-- The player securing the first piece wins
+- The player securing the first tower wins
 - One player has at least 6 opponent stones credited in the vault
 
 <img src="./images/intro4.png" height="200"/>
@@ -44,17 +46,16 @@ or secured all of his own.
 
 The heuristic score algorithm for the Alpha-beta pruning evaluation function
 can be optimized by adjusting the weights for the following strategies.
-A configuration change for the winning rules may necessitate such customizations.
+**Note:** A configuration change for the winning rules may necessitate such customizations.
 
 ### Safety zone proximity
 
 - **Material advantage:** Apply weights for each tower in reverse movement,
   depending on the distance (number of cells left) to reach the safety zone.
   More towers in reverse movement or a lesser distance may yield to a higher score.
-- **Positional advantage:** Apply a weight to the difference of the
-  total distance between both players for all towers in reverse movement. Even if one player has only
-  one tower left, a win might still be possible by reaching the safety zone first.
-  This weight gets accounted for a player only if all owning pieces are already in reverse movement.
+- **Positional advantage:** Apply an additional constant factor, if the total
+  distance to the safety zone is less than 5 rows,
+  i.e. if just two moves are left to win the game.
 - **Defensive factor:** The opponent player may get a higher score on equal
   conditions, this could prevent a positional advantage.
 

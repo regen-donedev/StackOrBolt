@@ -138,8 +138,23 @@ function getTerminalNodeState(boardState, depth) {
             userTowerSafetyWeight) *
           cachedSettingsState.safetyZoneProximity.settings.totalWeight
       );
+      // If the total distance of all towers in reverse movement is lesser than 5 rows,
+      // this means that all towers are already in reverse movement and a win is just
+      // 2 moves away.
+      if (userTowerTotalSafetyDistance > 4) {
+        userTowerTotalSafetyDistance = 0;
+      } else {
+        userTowerTotalSafetyDistance = 1;
+      }
+      if (botTowerTotalSafetyDistance > 4) {
+        botTowerTotalSafetyDistance = 0;
+      } else {
+        botTowerTotalSafetyDistance = 1;
+      }
       score +=
-        (userTowerTotalSafetyDistance - botTowerTotalSafetyDistance) *
+        (botTowerTotalSafetyDistance -
+          userTowerTotalSafetyDistance *
+            cachedSettingsState.safetyZoneProximity.settings.opponentWeight) *
         cachedSettingsState.safetyZoneProximity.settings
           .safetyZoneTotalDistance *
         cachedSettingsState.safetyZoneProximity.settings.totalWeight;
