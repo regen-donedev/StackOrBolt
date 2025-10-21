@@ -1,12 +1,12 @@
 # StackOrBolt
 
-A classic two player board game with an ai opponent.
+A classic two player turn-based board game with an ai opponent.
 <a href="https://regen-donedev.github.io/StackOrBolt/">Play online</a>
 
 ## Game Rules
 
 Move a piece one or two cells forward or sideward
-onton an empty cell or opponent's piece.
+onto an empty cell or opponent's piece.
 You can wraparound the board for sideward moves,
 but two consecutive sideward moves are not allowed.
 
@@ -53,7 +53,7 @@ can be optimized by adjusting the weights for the following strategies.
 - **Material advantage:** Apply weights for each tower in reverse movement,
   depending on the distance (number of cells left) to reach the safety zone.
   More towers in reverse movement or a lesser distance may yield to a higher score.
-- **Positional advantage:** Apply an additional constant factor, if the total
+- **Positional advantage:** Apply an additional constant weight, if the total
   distance to the safety zone is less than 5 rows,
   i.e. if just two moves are left to win the game.
 - **Defensive factor:** The opponent player may get a higher score on equal
