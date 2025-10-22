@@ -53,9 +53,11 @@ can be optimized by adjusting the weights for the following strategies.
 - **Material advantage:** Apply weights for each tower in reverse movement,
   depending on the distance (number of cells left) to reach the safety zone.
   More towers in reverse movement or a lesser distance may yield to a higher score.
-- **Positional advantage:** Apply an additional constant weight, if the total
-  distance to the safety zone is less than 5 rows,
-  i.e. if just two moves are left to win the game.
+- **Positional advantage:** One player might intentionally sacrifice a vast amount of
+  own material, so that **all** own remaining towers left can reach the safety zone quickly.
+  This specific weight is an additional factor, if the total
+  distance to the safety zone for a player is less than 5 rows,
+  i.e. if at most four moves are left to win the game.
 - **Defensive factor:** The opponent player may get a higher score on equal
   conditions, this could prevent a positional advantage.
 
