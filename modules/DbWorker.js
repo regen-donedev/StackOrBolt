@@ -14,7 +14,7 @@ import { LOGGER_DB_ITEMS } from "./Logger.js";
 
 const idbFactory = self.indexedDB ?? null;
 let db = null;
-const dbVersion = 30;
+const dbVersion = 31;
 let initFromScratch = false;
 
 /**
@@ -160,7 +160,7 @@ async function storeXact(objStoreName, method, parm = null) {
 async function openDb() {
   return new Promise((resolve, reject) => {
     try {
-      const dbRequest = idbFactory.open("TowerHunt", dbVersion);
+      const dbRequest = idbFactory.open("StackOrBolt", dbVersion);
       dbRequest.addEventListener("upgradeneeded", (event) => {
         initFromScratch = true;
         const db = event.target.result;
