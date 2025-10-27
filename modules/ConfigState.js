@@ -72,7 +72,7 @@ class Settings {
    */
   static factorySearchRules = Object.freeze({
     id: "SearchRules",
-    settings: { depth: 4, timeout: 10 },
+    settings: { depth: 5, timeout: 50 },
   });
 
   /**
@@ -81,7 +81,7 @@ class Settings {
    */
   static factoryMaterialAdvantageConquered = Object.freeze({
     id: "MaterialAdvantageConquered",
-    settings: { totalWeight: 70, opponentWeight: 2.0 },
+    settings: { totalWeight: 70, opponentWeight: 1.0 },
   });
 
   /**
