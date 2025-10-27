@@ -4,6 +4,13 @@
  *                - Event-based messaging between the main thread and a Web Worker instance.
  *                - Triggering and waiting for dispatched CSS transition events.
  *                - Event Listener handling for custom dispatched events in the main thread.
+ * @exports  dispatchWorker - Handles the event messaging interface between main thread and web worker.
+ * @exports workerMessageScheme - Basic object layout for the message
+ * @exports cssTransitionEnded - Handles the background-color transition end event
+ * for a div element related to a cell on the board
+ * @exports messageSchemeComparator - Validates the object sent back from the web worker thread.
+ * @exports handleResponse - Throws an error if the posted message object from a web worker is invalid.
+ * @exports autoPlayTerminated - Handles the dispatched custom EventTarget for auto-replay termination (clicked on the pause icon)
  */
 
 const workerMessageScheme = Object.freeze({

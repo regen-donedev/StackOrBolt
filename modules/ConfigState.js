@@ -81,7 +81,7 @@ class Settings {
    */
   static factoryMaterialAdvantageConquered = Object.freeze({
     id: "MaterialAdvantageConquered",
-    settings: { totalWeight: 70 },
+    settings: { totalWeight: 70, opponentWeight: 2.0 },
   });
 
   /**

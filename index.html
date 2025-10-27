@@ -390,6 +390,9 @@
               owning material between the maximizing player (bot) and the
               minimizing player (user).
               <br />
+              A higher value for the opponent weight factor yields to a more
+              defensive strategy.
+              <br />
               <br />
             </p>
           </div>
@@ -534,6 +537,22 @@
               />
             </fieldset>
             <output for="materialAdvantageConquered"></output>
+          </div>
+          <div class="slider">
+            <fieldset>
+              <label for="materialAdvantageOpponentWeight"
+                >opponent weight:</label
+              >
+              <input
+                type="range"
+                id="materialAdvantageOpponentWeight"
+                name="materialAdvantageOpponentWeight"
+                min="0"
+                max="2"
+                step="0.5"
+              />
+            </fieldset>
+            <output for="materialAdvantageOpponentWeight"></output>
           </div>
         </form>
         <form class="panel">
@@ -717,7 +736,7 @@
               <use href="./images/icons.svg#icon_replay"></use>
             </svg>
             <dialog class="dialogReplayCommit">
-              <div class="containerConfirmCancel" data-last-bot-move="">
+              <div class="containerConfirmCancel" data-last-bot-move="0">
                 <div class="containerConfirmCancelCaption">
                   Replay after bot move # ?
                 </div>

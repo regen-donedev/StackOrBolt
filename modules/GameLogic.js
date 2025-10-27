@@ -1,15 +1,15 @@
 /**
  * @module GameLogic
- * @description This module contains the core game logic for the TowerHunt game,
+ * @description This module contains the core game logic for the StackOrBolt game,
  * including legal move topology, move execution, game state updates,
  * player turn switching, move validation, and win condition checks.
  * @requires module:GameState
  * @requires module:ConfigState
- * @exports playMove
- * @exports getLocalMoves
- * @exports getAllPossibleMoves
- * @exports checkWin
- * @exports switchPlayer
+ * @exports playMove - Update the new game state in memory and in the current dom
+ * @exports getLocalMoves - Helper function to inquire the possible target moves for each position on the board
+ * @exports getAllPossibleMoves - Helper function for the bot ai logic to iterate through the whole game tree
+ * @exports checkWin - Check for a winning state
+ * @exports switchPlayer - Switch player on each turn
  */
 import {
   PLAYER_ID,

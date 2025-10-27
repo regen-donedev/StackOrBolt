@@ -65,7 +65,10 @@ can be optimized by adjusting the weights for the following strategies.
 
 - **Conquered material:** Apply a total weight to the difference of all owning
   and opponent's pieces. A higher weight may yield to a state where all
-  the opponet's material will be conquered.
+  the opponent's material will be conquered.
+- **Defensive factor:** The opponent player may get a higher score on equal
+  conditions, this could prevent a positional advantage,
+  where the opponent might have more conquered material.
 - **Vault credit accounting:** If you stack onto an opponent tower
   where the stack size limit exceeds, the removed opponent stones are
   credited to the player's own vault.

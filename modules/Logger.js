@@ -4,9 +4,11 @@
  * which are essential for logging and fetching historic game moves from the database.
  * @requires module:AsyncAPIWrapper
  * @requires module:GameState
- * @exports LoggerWriter
- * @exports LOGGER_DB_ITEMS
- * @exports LoggerReader
+ * @exports LoggerWriter - The LoggerWriter class taht manages logging the game state to the IndexedDB database
+ * @exports LOGGER_DB_ITEMS - Constants
+ * @exports LoggerReader - The LoggerReader class that manages the game replay state
+ * @exports cacheAllIndexKeys - Helper function for pre-loading all game history metadata
+ * @exports cacheKeysFromIndex - Helper function to cache all primary keys for a LoggerReader instance
  */
 import {
   dispatchWorker,

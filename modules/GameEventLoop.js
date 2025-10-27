@@ -1,19 +1,26 @@
 /**
  * @module GameEventLoop
- * @description
+ * @description The main logic for handling the each players's move in the current game.
  * @requires module:GameState
  * @requires module:GameLogic
  * @requires module:AsyncAPIWrapper
  * @requires module:main
+ * @requires module:Logger
+ * @exports enableBoardEvents - Re-enable animations after a bot's move and on the user's turn
+ * @exports handleHoveredCellIn - Helper function managing animations related to the move selection for the user
+ * @exports handleHoveredCellOut - Helper function managing animations related to the move selection for the user
+ * @exports prepareMoveForCell - Helper function managing animations related to the move selection for the user
+ * @exports discardMoveForCell - Helper function managing animations related to the move selection for the user
+ * @exports playUserMove - Trigger the user and subsequent bot move cycle for the currewnt game
+ * @exports resetGame - Reset the whole game, the old game history can still be replayed
  */
 import { PLAYER_ID, GridCell, BoardState, Sidebar, Move } from "./GameState.js";
-import { checkWin } from "./GameLogic.js";
+import { checkWin, getLocalMoves } from "./GameLogic.js";
 import {
   dispatchWorker,
   workerMessageScheme,
   cssTransitionEnded,
 } from "./AsyncAPIWrapper.js";
-import { getLocalMoves } from "./GameLogic.js";
 import { reCreateAiWorker } from "../main.js";
 import { LoggerReader } from "./Logger.js";
 

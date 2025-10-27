@@ -5,7 +5,7 @@
  * @property {number} max_search_depth - The maximum search depth for the Minimax algorithm.
  * @requires module:GameState
  * @requires module:GameLogic
- * @exports findBestMove
+ * @exports findBestMove - Find the next best ai move for the bot
  */
 import { checkWin, getAllPossibleMoves } from "./GameLogic.js";
 import { BoardState, Move } from "./GameState.js";
@@ -127,7 +127,9 @@ function getTerminalNodeState(boardState, depth) {
     // Increase the heuristic score for Conquered Material Advantage
     // by applying the final weight for the total difference.
     score +=
-      (botTowers - userTowers) *
+      (botTowers -
+        cachedSettingsState.materialAdvantageConquered.settings.opponentWeight *
+          userTowers) *
       cachedSettingsState.materialAdvantageConquered.settings.totalWeight;
     // Increase the heuristic score for Safety Zone Proximity
     // by applying the final weight for the total difference.

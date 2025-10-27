@@ -1,6 +1,8 @@
 /**
  * @module ErrorUtils
  * @description Provides a centralized function for error event logging.
+ * @exports handleErrorEvent - This error event handler is used in all catch blocks
+ * for the main and web worker threads
  */
 
 /**

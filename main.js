@@ -393,6 +393,11 @@ function initRangeSlidersFromDb(settings, inputs, outputs) {
           settings.materialAdvantageConquered.settings.totalWeight
         );
         break;
+      case "materialAdvantageOpponentWeight":
+        input.value = String(
+          settings.materialAdvantageConquered.settings.opponentWeight
+        );
+        break;
       case "safetyZone1":
         input.value = String(
           settings.safetyZoneProximity.settings.weightRowDistance1
@@ -480,6 +485,11 @@ async function saveCurrentSettings(domInputs, dbSettings) {
         break;
       case "materialAdvantageConquered":
         newMaterialAdvantageConquered.settings.totalWeight = Number(
+          input.value
+        );
+        break;
+      case "materialAdvantageOpponentWeight":
+        newMaterialAdvantageConquered.settings.opponentWeight = parseFloat(
           input.value
         );
         break;
@@ -849,12 +859,23 @@ async function initReplayLoggerEventHandlers() {
         if (!dialogReplayNoData) {
           throw new Error("cannot relocate dialog element no data commit info");
         }
+        if (
+          LoggerReader.instances.size === 0 ||
+          !LoggerReader.currentSelectedInstance
+        ) {
+          dialogReplayNoData.showModal();
+          return;
+        }
         const lastBotMove = Number(
           dialogReplayCommit
             .querySelector(".containerConfirmCancel")
             .getAttribute("data-last-bot-move")
         );
-        if (isNaN(lastBotMove)) {
+        if (
+          lastBotMove === null ||
+          lastBotMove === undefined ||
+          isNaN(lastBotMove)
+        ) {
           throw new Error(
             "cannot relocate last bot move attribute or cancel icon"
           );
@@ -868,14 +889,10 @@ async function initReplayLoggerEventHandlers() {
             "cannot relocate caption element for replay commit dialog"
           );
         }
-        if (isNaN(lastBotMove) || lastBotMove < 1) {
-          dialogReplayNoData.showModal();
-        } else {
-          containerConfirmCancelCaption.textContent = `Replay after bot move #${String(
-            lastBotMove
-          )} ?`;
-          dialogReplayCommit.showModal();
-        }
+        containerConfirmCancelCaption.textContent = `Replay after bot move #${String(
+          lastBotMove
+        )} ?`;
+        dialogReplayCommit.showModal();
       }
     } catch (error) {
       handleErrorEvent(error);

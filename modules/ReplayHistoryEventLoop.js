@@ -1,10 +1,19 @@
 /**
  * @module ReplayhistoryEventLoop
- * @description
+ * @description The main for handling the game replay section.
  * @requires module:Logger
  * @requires module:GameState
  * @requires module:GameEventLoop
  * @requires module:ErrorUtils
+ * @requires module:AsyncApiWrapper
+ * @exports loadGameHistoryMove - load and print the next move in the game replay section
+ * @exports  autoPlayTerminate - trigger and await the autoplay termination after clicking the pause icon
+ * @exports  autoPlayManager - mange the autoplay state for game replay
+ * @exports  updateSvg - helper function for printing the piece for a cell
+ * @exports  dialogGameReplaySelectionHandler - Event Listener callback functions inside the upload dialog
+ * @exports  dialogReplayCurrentGameStateHandler - Event listener callback functions inside the replay commit dialog
+ * @exports  dialogNoHistoryDataFoundHandler - Event listener callback functions for the "no game data in db" dialog
+ * @exports  dialogInvalidStateForReplayHandler - Event listener callback functions for the "no game state to replay" dialog
  */
 import { handleErrorEvent } from "./ErrorUtils.js";
 import { LoggerWriter, LoggerReader } from "./Logger.js";
@@ -251,14 +260,13 @@ function updateLastBotMove(moveNo, playerState) {
   const helperHeader = helperDiv.querySelector(
     ".containerConfirmCancelCaption"
   );
-  if (isNaN(moveNo) || moveNo <= 1) {
-    helperDiv.setAttribute("data-last-bot-move", "");
-    return;
+  if (isNaN(moveNo)) {
+    throw new Error("invalid move number!");
   }
   const logRecordDataBot = playerState._twoPlayer.find(
     (player, _) => player._id === PLAYER_ID.BOT
   );
-  if (!logRecordDataBot || logRecordDataBot._turn === true) {
+  if (moveNo > 0 && (!logRecordDataBot || logRecordDataBot._turn === true)) {
     return;
   }
   helperHeader.textContent = `Replay after bot move ###${String(moveNo)} ?`;
@@ -435,7 +443,7 @@ async function dialogReplayCurrentGameStateHandler(event) {
       return;
     }
     const lastBotMove = Number(container.getAttribute("data-last-bot-move"));
-    if (isNaN(lastBotMove) || lastBotMove <= 1) {
+    if (isNaN(lastBotMove)) {
       dialog.close();
       return;
     }
