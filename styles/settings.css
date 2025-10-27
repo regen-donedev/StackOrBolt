@@ -1,0 +1,124 @@
+#sectSettings {
+  & header {
+    /*
+      The navigation bar from where you can:
+        - go back to the main game board
+        - save your settings
+        - restore all settings to factory default
+    */
+    & nav {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 10vw;
+      gap: 10dvw;
+      width: 80vw;
+      width: 80dvw;
+      height: 20vh;
+      height: 20dvh;
+      margin-top: 3vh;
+      margin-top: 3dvh;
+      & > div {
+        & a,
+        svg {
+          flex: 1;
+        }
+      }
+    }
+  }
+  /* 
+    The two dimensional grid and scroll container 
+    for navigating the control panels. 
+  */
+  & main {
+    width: 80vw;
+    width: 80dvw;
+    height: 70vh;
+    height: 70dvh;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow: auto;
+    scroll-snap-type: both mandatory;
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: none;
+    /* The current snapped scroll item. 
+       This is a html form element where you can adjust 
+       the settings via input slider elements */
+    & .panel {
+      scroll-snap-align: center;
+      width: inherit;
+      height: inherit;
+      background-color: light-dark(
+        var(--light-tile-color1),
+        var(--dark-tile-color1)
+      );
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      container-type: inline-size;
+      container-name: textFitter;
+      /* 
+        Alternate background colors for the scroll items.
+      */
+      &:nth-child(even) {
+        background-color: light-dark(
+          var(--light-tile-color2),
+          var(--dark-tile-color2)
+        );
+      }
+      & .panelIntro {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-width: 0;
+        width: 90%;
+        outline: medium groove
+          light-dark(var(--light-dot-color), var(--dark-dot-color));
+        border-style: solid;
+        overflow: scroll;
+        font-size: clamp(0.7rem, 5cqmin, 1.5rem);
+      }
+      /* 
+        Arrange the input slider and its label for the fieldset in column flex-flow.
+        Place the output element to the right of the fieldset.
+        Span the width of the fieldset 5 times bigger than the width of the output element.
+      */
+      & .slider {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        min-width: 0;
+        width: 90%;
+        outline: medium groove
+          light-dark(var(--light-dot-color), var(--dark-dot-color));
+        border-style: solid;
+        & > fieldSet,
+        & > output {
+          flex-basis: 0;
+          flex-grow: 1;
+        }
+        & > fieldset {
+          flex-grow: 5;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          border-style: none;
+          & > input[type="range"],
+          & label {
+            min-width: 0;
+            width: 90%;
+          }
+        }
+        & > fieldset,
+        & output {
+          overflow: scroll;
+          font-size: clamp(0.7rem, 5cqmin, 1.5rem);
+        }
+      }
+    }
+  }
+}

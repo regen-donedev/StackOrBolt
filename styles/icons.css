@@ -1,0 +1,60 @@
+.icon {
+  position: absolute;
+  fill: light-dark(var(--light-icon-color), var(--dark-icon-color));
+  top: 10%;
+  left: 10%;
+  width: 80%;
+  height: 80%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+.iconDigit {
+  fill: light-dark(var(--light-digit-color), var(--dark-digit-color));
+  opacity: 1;
+}
+.fillColorUser {
+  fill: light-dark(var(--light-user-color), var(--dark-user-color));
+  opacity: 1;
+}
+.fillColorBot {
+  fill: light-dark(var(--light-bot-color), var(--dark-bot-color));
+  opacity: 1;
+}
+.fillColorIcon {
+  fill: light-dark(var(--light-icon-color), var(--dark-icon-color));
+}
+.strokeColor {
+  stroke: light-dark(var(--light-bg-color), var(--dark-bg-color));
+}
+.fillColorDot {
+  fill: light-dark(var(--light-dot-color), var(--dark-dot-color));
+}
+.fillColorUser2 {
+  fill: light-dark(var(--light-user-color2), var(--dark-user-color2));
+  fill-opacity: 1;
+  color: light-dark(var(--light-user-color2), var(--dark-user-color2));
+}
+.fillColorBot2 {
+  fill: light-dark(var(--light-bot-color2), var(--dark-bot-color2));
+  fill-opacity: 1;
+  color: light-dark(var(--light-bot-color2), var(--dark-bot-color2));
+}
+.svgHide {
+  display: none;
+}
+.svgTower {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.icon2 {
+  pointer-events: visible;
+  cursor: pointer;
+  fill: light-dark(var(--light-icon-color), var(--dark-icon-color));
+  width: 80%;
+  height: 80%;
+  opacity: 0.4;
+}

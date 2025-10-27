@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stack Or Bolt</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./styles/base.css" />
+    <link rel="stylesheet" href="./styles/boardAnimations.css" />
+    <link rel="stylesheet" href="./styles/boardGrid.css" />
+    <link rel="stylesheet" href="./styles/dialogs.css" />
+    <link rel="stylesheet" href="./styles/icons.css" />
+    <link rel="stylesheet" href="./styles/sameOriginTransitions.css" />
+    <link rel="stylesheet" href="./styles/settings.css" />
+    <script src="./main.js" defer type="module"></script>
+  </head>
+  <body>
+    <section id="sectHome">
+      <div class="wrapper">
+        <div class="navbar">
+          <div class="navbarRestart">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_restart"></use>
+            </svg>
+          </div>
+          <div class="navbarSettings">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_settings"></use>
+            </svg>
+          </div>
+          <div class="navbarDatabase">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_database"></use>
+            </svg>
+          </div>
+        </div>
+        <div class="sidebar sidebarBot">
+          <div class="walletId">
+            <svg class="icon fillColorBot" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_bot"></use>
+            </svg>
+          </div>
+          <div class="horizontalMove">
+            <svg
+              class="icon fillColorBot svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_ban"></use>
+            </svg>
+          </div>
+          <div class="horizontalMoveLeft">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_arrow_left"></use>
+            </svg>
+          </div>
+          <div class="horizontalMoveRight">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_arrow_right"></use>
+            </svg>
+          </div>
+          <div class="safetyTile">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_shield"></use>
+            </svg>
+          </div>
+          <div class="safetyDigit">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_digit_0"></use>
+            </svg>
+          </div>
+          <div class="vaultTile">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_vault"></use>
+            </svg>
+          </div>
+          <div class="vaultOpponent"></div>
+          <div class="vaultDigit">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_digit_0"></use>
+            </svg>
+          </div>
+          <div class="handPointer">
+            <svg
+              class="icon fillColorBot svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_hand_points_up"></use>
+            </svg>
+          </div>
+        </div>
+        <div class="board">
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+        </div>
+        <div class="sidebar sidebarUser">
+          <div class="walletId">
+            <svg class="icon fillColorUser" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_user"></use>
+            </svg>
+          </div>
+          <div class="horizontalMove">
+            <svg
+              class="icon fillColorUser svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_ban"></use>
+            </svg>
+          </div>
+          <div class="horizontalMoveLeft">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_arrow_left"></use>
+            </svg>
+          </div>
+          <div class="horizontalMoveRight">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_arrow_right"></use>
+            </svg>
+          </div>
+          <div class="safetyTile">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_shield"></use>
+            </svg>
+          </div>
+          <div class="safetyDigit">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_digit_0"></use>
+            </svg>
+          </div>
+          <div class="vaultTile">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_vault"></use>
+            </svg>
+          </div>
+          <div class="vaultOpponent"></div>
+          <div class="vaultDigit">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_digit_0"></use>
+            </svg>
+          </div>
+          <div class="handPointer">
+            <svg
+              class="icon fillColorUser svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_hand_points_up"></use>
+            </svg>
+          </div>
+        </div>
+        <div class="CSSloadSpinner">
+          <div class="spinner1">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <g class="svgTower svgHide">
+                <circle cx="50" cy="50" r="35" class="fillColorIcon"></circle>
+              </g>
+            </svg>
+          </div>
+          <div class="spinner2">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <g class="svgTower svgHide">
+                <circle cx="50" cy="50" r="35" class="fillColorIcon"></circle>
+              </g>
+            </svg>
+          </div>
+          <div class="spinner3">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <g class="svgTower svgHide">
+                <circle cx="50" cy="50" r="35" class="fillColorIcon"></circle>
+              </g>
+            </svg>
+          </div>
+          <div class="spinner4">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <g class="svgTower svgHide">
+                <circle cx="50" cy="50" r="35" class="fillColorIcon"></circle>
+              </g>
+            </svg>
+          </div>
+          <div class="spinner5">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <g class="svgTower svgHide">
+                <circle cx="50" cy="50" r="35" class="fillColorIcon"></circle>
+              </g>
+            </svg>
+          </div>
+          <div class="spinner6">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+              <g class="svgTower svgHide">
+                <circle cx="50" cy="50" r="35" class="fillColorIcon"></circle>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="footer">
+          <div class="footerGithub">
+            <a
+              href="https://github.com/regen-donedev/StackOrBolt/blob/main/README.md"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+                <use href="./images/icons.svg#icon_github"></use>
+              </svg>
+            </a>
+          </div>
+          <div class="footerThemeLight">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_themeLight"></use>
+            </svg>
+            <input type="radio" name="theme" class="radioThemeLight" />
+          </div>
+          <div class="footerThemeDark">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_themeDark"></use>
+            </svg>
+            <input type="radio" name="theme" class="radioThemeDark" />
+          </div>
+        </div>
+      </div>
+      <dialog class="dialogAiWorkerTimeout">
+        <div class="containerConfirmCancel">
+          <div class="containerConfirmCancelCaption">
+            The game was resetted due to a timeout condition in the AI worker
+            thread. Increase the timeout value or decrease the search tree
+            depth.
+          </div>
+          <div class="containerConfirmUI">
+            <svg class="icon2 iconConfirm" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_confirm"></use>
+            </svg>
+          </div>
+        </div>
+      </dialog>
+    </section>
+    <section id="sectSettings">
+      <header>
+        <nav>
+          <div>
+            <a href="#sectHome">
+              <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+                <use href="./images/icons.svg#icon_back"></use>
+              </svg>
+            </a>
+          </div>
+          <div>
+            <dialog class="dialogSettingsSave">
+              <div class="containerConfirmCancel">
+                <div class="containerConfirmCancelCaption">
+                  Save current settings?
+                </div>
+                <div class="containerConfirmCancelUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
+                  </svg>
+                  <svg
+                    class="icon2 iconCancel"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_cancel"></use>
+                  </svg>
+                </div>
+              </div>
+            </dialog>
+            <svg class="icon2 iconSave" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_save"></use>
+            </svg>
+          </div>
+          <div>
+            <dialog class="dialogSettingsRecycle">
+              <div class="containerConfirmCancel">
+                <div class="containerConfirmCancelCaption">
+                  Restore all settings to factory default?
+                </div>
+                <div class="containerConfirmCancelUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
+                  </svg>
+                  <svg
+                    class="icon2 iconCancel"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_cancel"></use>
+                  </svg>
+                </div>
+              </div>
+            </dialog>
+            <svg class="icon2 iconRecycle" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_recycle"></use>
+            </svg>
+          </div>
+          <div>
+            <a
+              href="https://github.com/regen-donedev/StackOrBolt/blob/main/README.md"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+                <use href="./images/icons.svg#icon_github"></use>
+              </svg>
+            </a>
+          </div>
+        </nav>
+      </header>
+      <main>
+        <form class="panel">
+          <div class="panelIntro">
+            <h1>Game Rules Configuration</h1>
+            <p>
+              Adjust additional winning rules.
+              <br />
+              <br />
+              Adjust the max stack size for a tower.
+              <br />
+              <br />
+            </p>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="panelIntro">
+            <h1>Search Tree Configuration</h1>
+            <p>
+              Adjust the search tree depth and timeout value for the AI worker
+              thread.
+              <br />
+              <br />
+            </p>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="panelIntro">
+            <h1>Safety Zone Proximity heuristic score algorithm</h1>
+            <p>
+              Exactly one of these weights gets applied for every tower on the
+              board in reverse movement.
+              <br />
+              A higher value for the opponent weight factor yields to a more
+              defensive strategy.
+              <br />
+              The total difference of these summed weights gets multiplicated
+              with the total weight factor.
+              <br />
+              <br />
+            </p>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="panelIntro">
+            <h1>Material Advantage heuristic score algorithm</h1>
+            <p>
+              These weights apply to the difference of the total number of
+              owning material between the maximizing player (bot) and the
+              minimizing player (user).
+              <br />
+              <br />
+            </p>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="safetyTowers"
+                >towers that reached the safety zone winning rule</label
+              >
+              <input
+                type="range"
+                id="safetyTowers"
+                name="safetyTowers"
+                min="1"
+                max="6"
+              />
+            </fieldset>
+            <output for="safetyTowers"></output>
+          </div>
+          <div class="slider">
+            <fieldset>
+              <label for="opponentStones"
+                >opponent pieces conquered winning rule</label
+              >
+              <input
+                type="range"
+                id="opponentStones"
+                name="opponentStones"
+                min="0"
+                max="6"
+              />
+            </fieldset>
+            <output for="opponentStones"></output>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="searchDepth">search tree depth</label>
+              <input
+                type="range"
+                id="searchDepth"
+                name="searchDepth"
+                min="1"
+                max="5"
+              />
+            </fieldset>
+            <output for="searchDepth"></output>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZone1"
+                >safety zone distance 1 row left, weight:</label
+              >
+              <input
+                type="range"
+                id="safetyZone1"
+                name="safetyZone1"
+                min="0"
+                max="10"
+              />
+            </fieldset>
+            <output for="safetyZone1"></output>
+          </div>
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZone2"
+                >safety zone distance 2 rows left, weight:</label
+              >
+              <input
+                type="range"
+                id="safetyZone2"
+                name="safetyZone2"
+                min="0"
+                max="10"
+              />
+            </fieldset>
+            <output for="safetyZone2"></output>
+          </div>
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZone3"
+                >safety zone distance 3 rows left, weight:</label
+              >
+              <input
+                type="range"
+                id="safetyZone3"
+                name="safetyZone3"
+                min="0"
+                max="10"
+              />
+            </fieldset>
+            <output for="safetyZone3"></output>
+          </div>
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZone4"
+                >safety zone distance 4 rows left, weight:</label
+              >
+              <input
+                type="range"
+                id="safetyZone4"
+                name="safetyZone4"
+                min="0"
+                max="10"
+              />
+            </fieldset>
+            <output for="safetyZone4"></output>
+          </div>
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZone5"
+                >safety zone distance 5 rows left, weight:</label
+              >
+              <input
+                type="range"
+                id="safetyZone5"
+                name="safetyZone5"
+                min="0"
+                max="10"
+              />
+            </fieldset>
+            <output for="safetyZone5"></output>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="materialAdvantageConquered"
+                >owning towers weight</label
+              >
+              <input
+                type="range"
+                id="materialAdvantageConquered"
+                name="materialAdvantageConquered"
+                min="0"
+                max="100"
+                step="10"
+              />
+            </fieldset>
+            <output for="materialAdvantageConquered"></output>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="maxStackSize">max stack size for a tower piece</label>
+              <input
+                type="range"
+                id="maxStackSize"
+                name="maxStackSize"
+                min="1"
+                max="3"
+              />
+            </fieldset>
+            <output for="maxStackSize"></output>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="searchTimeout">search timeout (secs)</label>
+              <input
+                type="range"
+                id="searchTimeout"
+                name="searchTimeout"
+                min="1"
+                max="50"
+              />
+            </fieldset>
+            <output for="searchTimeout"></output>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZoneTotalDistanceWeight"
+                >total distance to safety zone lesser 5 rows:</label
+              >
+              <input
+                type="range"
+                id="safetyZoneTotalDistanceWeight"
+                name="safetyZoneTotalDistanceWeight"
+                min="0"
+                max="10"
+                step="1"
+              />
+            </fieldset>
+            <output for="safetyZoneTotalDistanceWeight"></output>
+          </div>
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZoneOpponentWeight">opponent weight:</label>
+              <input
+                type="range"
+                id="safetyZoneOpponentWeight"
+                name="safetyZoneOpponentWeight"
+                min="0"
+                max="2"
+                step="0.5"
+              />
+            </fieldset>
+            <output for="safetyZoneOpponentWeight"></output>
+          </div>
+          <div class="slider">
+            <fieldset>
+              <label for="safetyZoneTotalWeight">total weight:</label>
+              <input
+                type="range"
+                id="safetyZoneTotalWeight"
+                name="safetyZoneTotalWeight"
+                min="0"
+                max="100"
+                step="10"
+              />
+            </fieldset>
+            <output for="safetyZoneTotalWeight"></output>
+          </div>
+        </form>
+        <form class="panel">
+          <div class="slider">
+            <fieldset>
+              <label for="materialAdvantageAccounted"
+                >conquered stones weight</label
+              >
+              <input
+                type="range"
+                id="materialAdvantageAccounted"
+                name="materialAdvantageAccounted"
+                min="0"
+                max="100"
+                step="10"
+              />
+            </fieldset>
+            <output for="materialAdvantageAccounted"></output>
+          </div>
+        </form>
+      </main>
+    </section>
+    <section id="sectReplayLogger">
+      <div class="wrapper">
+        <div class="navbarReplayLogger">
+          <div class="navbarReturnHome">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_back"></use>
+            </svg>
+          </div>
+          <div class="navbarUploadModal">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_upload"></use>
+            </svg>
+            <dialog class="dialogUploadModal">
+              <main>
+                <template>
+                  <div class="panelGameId" data-db-key="">
+                    <div class="subgridHeader">
+                      View and replay game history
+                    </div>
+                    <div class="subgridUiIcons">
+                      <svg
+                        class="icon2 cancelGameDialog"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <use href="./images/icons.svg#icon_back"></use>
+                      </svg>
+                      <svg
+                        class="icon2 selectGameId"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <use href="./images/icons.svg#icon_confirm"></use>
+                      </svg>
+                    </div>
+                    <div class="subgridGameIdItems">
+                      <div>started</div>
+                      <div class="panelGameStarted"></div>
+                      <div>moves</div>
+                      <div class="panelTotalMoves"></div>
+                      <div>status</div>
+                      <div class="panelGameFinished"></div>
+                      <div>winner</div>
+                      <div class="panelGameWinner"></div>
+                    </div>
+                  </div>
+                </template>
+              </main>
+            </dialog>
+            <dialog class="dialogUploadNoData">
+              <div class="containerConfirmCancel">
+                <div class="containerConfirmCancelCaption">
+                  No game history found in database!
+                </div>
+                <div class="containerConfirmUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
+                  </svg>
+                </div>
+              </div>
+            </dialog>
+          </div>
+          <div class="navbarReplayMoveDisplay">
+            <div class="navbarReplayMoveHundreds">
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+                <use href="./images/icons.svg#icon_digit_0"></use>
+              </svg>
+            </div>
+            <div class="navbarReplayMoveTens">
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+                <use href="./images/icons.svg#icon_digit_0"></use>
+              </svg>
+            </div>
+            <div class="navbarReplayMoveOnes">
+              <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+                <use href="./images/icons.svg#icon_digit_0"></use>
+              </svg>
+            </div>
+          </div>
+          <div class="navbarReplayCommit">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_replay"></use>
+            </svg>
+            <dialog class="dialogReplayCommit">
+              <div class="containerConfirmCancel" data-last-bot-move="">
+                <div class="containerConfirmCancelCaption">
+                  Replay after bot move # ?
+                </div>
+                <div class="containerConfirmCancelUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
+                  </svg>
+                  <svg
+                    class="icon2 iconCancel"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_cancel"></use>
+                  </svg>
+                </div>
+              </div>
+            </dialog>
+            <dialog class="dialogReplayNoData">
+              <div class="containerConfirmCancel">
+                <div class="containerConfirmCancelCaption">
+                  No game history for replay selected!
+                </div>
+                <div class="containerConfirmUI">
+                  <svg
+                    class="icon2 iconConfirm"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <use href="./images/icons.svg#icon_confirm"></use>
+                  </svg>
+                </div>
+              </div>
+            </dialog>
+          </div>
+        </div>
+        <div class="sidebar sidebarBot">
+          <div class="walletId">
+            <svg class="icon fillColorBot" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_bot"></use>
+            </svg>
+          </div>
+          <div class="horizontalMove">
+            <svg
+              class="icon fillColorBot svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_ban"></use>
+            </svg>
+          </div>
+          <div class="horizontalMoveLeft">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_arrow_left"></use>
+            </svg>
+          </div>
+          <div class="horizontalMoveRight">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_arrow_right"></use>
+            </svg>
+          </div>
+          <div class="safetyTile">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_shield"></use>
+            </svg>
+          </div>
+          <div class="safetyDigit">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_digit_0"></use>
+            </svg>
+          </div>
+          <div class="vaultTile">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_vault"></use>
+            </svg>
+          </div>
+          <div class="vaultOpponent"></div>
+          <div class="vaultDigit">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_digit_0"></use>
+            </svg>
+          </div>
+          <div class="handPointer">
+            <svg
+              class="icon fillColorBot svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_hand_points_up"></use>
+            </svg>
+          </div>
+        </div>
+        <div class="board">
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+          <div class="boardCell tileColor2"></div>
+          <div class="boardCell tileColor1"></div>
+        </div>
+        <div class="sidebar sidebarUser">
+          <div class="walletId">
+            <svg class="icon fillColorUser" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_user"></use>
+            </svg>
+          </div>
+          <div class="horizontalMove">
+            <svg
+              class="icon fillColorUser svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_ban"></use>
+            </svg>
+          </div>
+          <div class="horizontalMoveLeft">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_arrow_left"></use>
+            </svg>
+          </div>
+          <div class="horizontalMoveRight">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_arrow_right"></use>
+            </svg>
+          </div>
+          <div class="safetyTile">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_shield"></use>
+            </svg>
+          </div>
+          <div class="safetyDigit">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_digit_0"></use>
+            </svg>
+          </div>
+          <div class="vaultTile">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_vault"></use>
+            </svg>
+          </div>
+          <div class="vaultOpponent"></div>
+          <div class="vaultDigit">
+            <svg class="icon iconDigit" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_digit_0"></use>
+            </svg>
+          </div>
+          <div class="handPointer">
+            <svg
+              class="icon fillColorUser svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_hand_points_up"></use>
+            </svg>
+          </div>
+        </div>
+        <div class="footerReplayLogger">
+          <div class="footerReplayBackwardFast">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_backward_fast"></use>
+            </svg>
+          </div>
+          <div class="footerReplayBackwardStep">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_backward_step"></use>
+            </svg>
+          </div>
+          <div class="footerReplayPlayPause">
+            <svg class="icon2 iconPlay" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_play"></use>
+            </svg>
+            <svg
+              class="icon2 iconPause svgHide"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <use href="./images/icons.svg#icon_pause"></use>
+            </svg>
+          </div>
+          <div class="footerReplayForwardStep">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_forward_step"></use>
+            </svg>
+          </div>
+          <div class="footerReplayForwardFast">
+            <svg class="icon2" xmlns="http://www.w3.org/2000/svg">
+              <use href="./images/icons.svg#icon_forward_fast"></use>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

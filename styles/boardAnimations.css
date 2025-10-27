@@ -1,0 +1,68 @@
+/* ********************************************************************************* */
+/* Transitions for the next move on the game board.                                   */
+/* ********************************************************************************* */
+.boardCell.hover,
+.boardCell.click {
+  background-color: violet;
+}
+.boardCell.select,
+.boardCell.mark {
+  background-color: lightblue;
+}
+/* ********************************************************************************* */
+/* Transform the game board and pieces to grayscale and golden the winning sidebar   */
+/* when the game has finished.                                                       */
+/* ********************************************************************************* */
+.filterGray {
+  filter: grayscale(80%);
+}
+.winnerSidebar {
+  background-color: gold;
+  filter: brightness(2);
+}
+/* ********************************************************************************* */
+/* Start transitioning these color-related properties for all html elements.         */
+/* As every value gets evaluated by light-dark(), this transition                    */
+/* only starts whenever the checked state gets toggled for the input radio elements. */
+/* These css definitions must also be applied to the pieces.svg sprite,              */
+/* because it contains explicitly defined css properties, which break the default    */
+/* css cascading and inheritance chain.                                              */
+/* ********************************************************************************* */
+* {
+  transition-property: background-color, fill, stroke, filter;
+  transition-duration: 0.8s;
+  transition-timing-function: linear;
+}
+/* ********************************************************************************* */
+/* CSS load spinner animations for the bot's next move                               */
+/* ********************************************************************************* */
+@keyframes pulse {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.2);
+    opacity: 0.4;
+  }
+}
+.CSSloadSpinner {
+  .spinner1.spinner1Animate {
+    animation: pulse 1s infinite alternate 0ms;
+  }
+  .spinner2.spinner2Animate {
+    animation: pulse 1s infinite alternate 200ms;
+  }
+  .spinner3.spinner3Animate {
+    animation: pulse 1s infinite alternate 400ms;
+  }
+  .spinner4.spinner4Animate {
+    animation: pulse 1s infinite alternate 600ms;
+  }
+  .spinner5.spinner5Animate {
+    animation: pulse 1s infinite alternate 800ms;
+  }
+  .spinner6.spinner6Animate {
+    animation: pulse 1s infinite alternate 1000ms;
+  }
+}

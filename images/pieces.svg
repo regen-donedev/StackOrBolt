@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <style>
+            * {
+                transition-property: background-color, fill, fill-opacity, stroke, filter;
+                transition-duration: 0.8s;
+                transition-timing-function: linear;
+            }
+        </style>
+    </defs>
+    <symbol id="tower_none">
+        <g></g>
+    </symbol>
+    <symbol id="tower_user">
+        <g>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_user_dot">
+        <g>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="50" cy="50" r="10" fill="light-dark(var(--light-dot-color), var(--dark-dot-color))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_user_bot">
+        <g>
+            <circle cx="45" cy="55" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="55" cy="45" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_user_bot_dot">
+        <g>
+            <circle cx="45" cy="55" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="55" cy="45" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="55" cy="45" r="10" fill="light-dark(var(--light-dot-color), var(--dark-dot-color))"></circle>
+        </g>
+    </symbol>
+        <symbol id="tower_user_bot_user">
+        <g>
+            <circle cx="40" cy="60" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="60" cy="40" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_user_bot_user_dot">
+        <g>
+            <circle cx="40" cy="60" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="60" cy="40" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="60" cy="40" r="10" fill="light-dark(var(--light-dot-color), var(--dark-dot-color))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_user_user_bot">
+        <g>
+            <circle cx="40" cy="60" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))" stroke="light-dark(var(--light-bg-color), var(--dark-bg-color))"></circle>
+            <circle cx="60" cy="40" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_user_user_bot_dot">
+        <g>
+            <circle cx="40" cy="60" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))" stroke="light-dark(var(--light-bg-color), var(--dark-bg-color))"></circle>
+            <circle cx="60" cy="40" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="60" cy="40" r="10" fill="light-dark(var(--light-dot-color), var(--dark-dot-color))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_bot">
+        <g>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_bot_dot">
+        <g>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="50" cy="50" r="10" fill="light-dark(var(--light-dot-color), var(--dark-dot-color))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_bot_user">
+        <g>
+            <circle cx="45" cy="55" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="55" cy="45" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_bot_user_dot">
+        <g>
+            <circle cx="45" cy="55" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="55" cy="45" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="55" cy="45" r="10" fill="light-dark(var(--light-dot-color), var(--dark-dot-color))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_bot_user_bot">
+        <g>
+            <circle cx="40" cy="60" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="60" cy="40" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_bot_user_bot_dot">
+        <g>
+            <circle cx="40" cy="60" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="60" cy="40" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="60" cy="40" r="10" fill="light-dark(var(--light-dot-color), var(--dark-dot-color))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_bot_bot_user">
+        <g>
+            <circle cx="40" cy="60" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))" stroke="light-dark(var(--light-bg-color), var(--dark-bg-color))"></circle>
+            <circle cx="60" cy="40" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+        </g>
+    </symbol>
+    <symbol id="tower_bot_bot_user_dot">
+        <g>
+            <circle cx="40" cy="60" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))"></circle>
+            <circle cx="50" cy="50" r="35" fill="light-dark(var(--light-bot-color2), var(--dark-bot-color2))" stroke="light-dark(var(--light-bg-color), var(--dark-bg-color))"></circle>
+            <circle cx="60" cy="40" r="35" fill="light-dark(var(--light-user-color2), var(--dark-user-color2))"></circle>
+            <circle cx="60" cy="40" r="10" fill="light-dark(var(--light-dot-color), var(--dark-dot-color))"></circle>
+        </g>
+    </symbol>
+</svg>
