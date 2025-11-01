@@ -208,7 +208,7 @@ class LoggerWriter {
       if (allIndexKeys.length > 9) {
         for (let i = 0, len = allIndexKeys.length - 9; i < len; i++) {
           const reader = LoggerReader.instances.get(allIndexKeys[i]);
-          LoggerReader.dispose(reader);
+          LoggerReader.dispose(reader.gameId);
           let allPrimaryKeys = await cacheKeysFromIndex(allIndexKeys[i]);
           for (const key of allPrimaryKeys) {
             const request = structuredClone(workerMessageScheme);
@@ -360,9 +360,15 @@ class LoggerReader {
   static scrollItemTemplate = null;
   static scrollContainer = null;
 
+  /**
+   * Deletes the reader instance and related object references
+   * including the html scroll item element for the upload dialog.
+   * @param {Number} gameId
+   * @returns {void}
+   */
   static dispose(gameId) {
     if (LoggerReader.instances.has(gameId)) {
-      const reader = LoggerReader.instances.get(gameId);
+      let reader = LoggerReader.instances.get(gameId);
       if (reader.generator) {
         reader.generator.return();
         reader.generator = null;
@@ -530,6 +536,15 @@ class LoggerReader {
    */
   get scrollItem() {
     return this._scrollItem;
+  }
+
+  /**
+   * Sets the EventTarget property.
+   * @public
+   * @param {HTMLDivElement | null} value
+   */
+  set scrollItem(value) {
+    this._scrollItem = value;
   }
 
   /**

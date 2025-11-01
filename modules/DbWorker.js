@@ -14,7 +14,7 @@ import { LOGGER_DB_ITEMS } from "./Logger.js";
 
 const idbFactory = self.indexedDB ?? null;
 let db = null;
-const dbVersion = 35;
+const dbVersion = 36;
 let initFromScratch = false;
 
 /**

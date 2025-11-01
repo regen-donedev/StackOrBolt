@@ -193,25 +193,7 @@ async function playUserMove(
  * @returns {Promise<void>}
  */
 async function playBotMove(domBoardState, settings, aiWorker, loggerWriter) {
-  //animate css load spinner
-  const spinner1 = document.querySelector(".spinner1");
-  const spinner2 = document.querySelector(".spinner2");
-  const spinner3 = document.querySelector(".spinner3");
-  const spinner4 = document.querySelector(".spinner4");
-  const spinner5 = document.querySelector(".spinner5");
-  const spinner6 = document.querySelector(".spinner6");
-  spinner1.classList.add("spinner1Animate");
-  spinner2.classList.add("spinner2Animate");
-  spinner3.classList.add("spinner3Animate");
-  spinner4.classList.add("spinner4Animate");
-  spinner5.classList.add("spinner5Animate");
-  spinner6.classList.add("spinner6Animate");
-  spinner1.querySelector("g").classList.remove("svgHide");
-  spinner2.querySelector("g").classList.remove("svgHide");
-  spinner3.querySelector("g").classList.remove("svgHide");
-  spinner4.querySelector("g").classList.remove("svgHide");
-  spinner5.querySelector("g").classList.remove("svgHide");
-  spinner6.querySelector("g").classList.remove("svgHide");
+  cssLoadSpinnerStart();
   // Dispatch worker for AI processing
   domBoardState.waitForWebWorker = true;
   const aiWorkerRequest = structuredClone(workerMessageScheme);
@@ -225,20 +207,6 @@ async function playBotMove(domBoardState, settings, aiWorker, loggerWriter) {
   );
   if (aiWorkerResponse.response.error === true) {
     if (aiWorkerResponse.response.message === "timeout") {
-      //hide css load spinner
-      spinner1.classList.remove("spinner1Animate");
-      spinner2.classList.remove("spinner2Animate");
-      spinner3.classList.remove("spinner3Animate");
-      spinner4.classList.remove("spinner4Animate");
-      spinner5.classList.remove("spinner5Animate");
-      spinner6.classList.remove("spinner6Animate");
-      spinner1.querySelector("g").classList.add("svgHide");
-      spinner2.querySelector("g").classList.add("svgHide");
-      spinner3.querySelector("g").classList.add("svgHide");
-      spinner4.querySelector("g").classList.add("svgHide");
-      spinner5.querySelector("g").classList.add("svgHide");
-      spinner6.querySelector("g").classList.add("svgHide");
-      reCreateAiWorker();
       handleAiWorkerTimeout(domBoardState, loggerWriter);
       return;
     } else {
@@ -278,19 +246,7 @@ async function playBotMove(domBoardState, settings, aiWorker, loggerWriter) {
       "Invalid move data received from worker. Invalid integer identifier for the source or target cell."
     );
   }
-  //hide css load spinner
-  spinner1.classList.remove("spinner1Animate");
-  spinner2.classList.remove("spinner2Animate");
-  spinner3.classList.remove("spinner3Animate");
-  spinner4.classList.remove("spinner4Animate");
-  spinner5.classList.remove("spinner5Animate");
-  spinner6.classList.remove("spinner6Animate");
-  spinner1.querySelector("g").classList.add("svgHide");
-  spinner2.querySelector("g").classList.add("svgHide");
-  spinner3.querySelector("g").classList.add("svgHide");
-  spinner4.querySelector("g").classList.add("svgHide");
-  spinner5.querySelector("g").classList.add("svgHide");
-  spinner6.querySelector("g").classList.add("svgHide");
+  cssLoadSpinnerStop();
   // trigger animations for this bot's move and wait for the end of the css transitions
   await cssTransitionEnded(moveBotSrcInst.domEl, "select");
   await cssTransitionEnded(moveBotTgtInst.domEl, "hover");
@@ -330,11 +286,65 @@ async function playBotMove(domBoardState, settings, aiWorker, loggerWriter) {
 }
 
 /**
+ * Starts the CSS load spinner animations
+ * @returns {void}
+ */
+function cssLoadSpinnerStart() {
+  const spinner1 = document.querySelector("#sectHome .spinner1");
+  const spinner2 = document.querySelector("#sectHome .spinner2");
+  const spinner3 = document.querySelector("#sectHome .spinner3");
+  const spinner4 = document.querySelector("#sectHome .spinner4");
+  const spinner5 = document.querySelector("#sectHome .spinner5");
+  const spinner6 = document.querySelector("#sectHome .spinner6");
+  spinner1.classList.add("spinner1Animate");
+  spinner2.classList.add("spinner2Animate");
+  spinner3.classList.add("spinner3Animate");
+  spinner4.classList.add("spinner4Animate");
+  spinner5.classList.add("spinner5Animate");
+  spinner6.classList.add("spinner6Animate");
+  spinner1.querySelector("g").classList.remove("svgHide");
+  spinner2.querySelector("g").classList.remove("svgHide");
+  spinner3.querySelector("g").classList.remove("svgHide");
+  spinner4.querySelector("g").classList.remove("svgHide");
+  spinner5.querySelector("g").classList.remove("svgHide");
+  spinner6.querySelector("g").classList.remove("svgHide");
+}
+
+/**
+ * Stops the CSS load spinner animations
+ * @returns {void}
+ */
+function cssLoadSpinnerStop() {
+  const spinner1 = document.querySelector("#sectHome .spinner1");
+  const spinner2 = document.querySelector("#sectHome .spinner2");
+  const spinner3 = document.querySelector("#sectHome .spinner3");
+  const spinner4 = document.querySelector("#sectHome .spinner4");
+  const spinner5 = document.querySelector("#sectHome .spinner5");
+  const spinner6 = document.querySelector("#sectHome .spinner6");
+  spinner1.classList.remove("spinner1Animate");
+  spinner2.classList.remove("spinner2Animate");
+  spinner3.classList.remove("spinner3Animate");
+  spinner4.classList.remove("spinner4Animate");
+  spinner5.classList.remove("spinner5Animate");
+  spinner6.classList.remove("spinner6Animate");
+  spinner1.querySelector("g").classList.add("svgHide");
+  spinner2.querySelector("g").classList.add("svgHide");
+  spinner3.querySelector("g").classList.add("svgHide");
+  spinner4.querySelector("g").classList.add("svgHide");
+  spinner5.querySelector("g").classList.add("svgHide");
+  spinner6.querySelector("g").classList.add("svgHide");
+}
+
+/**
  * Resets the game state for all DOM elements, Event Handlers and instances.
  * @param {BoardState} domBoardState
  * @returns {void}
  */
 function resetGame(domBoardState, loggerWriter) {
+  if (domBoardState.waitForWebWorker === true) {
+    cssLoadSpinnerStop();
+    reCreateAiWorker();
+  }
   domBoardState.cells.forEach((cell) => {
     cell.svgLayout = [];
     cell.updateSvg();

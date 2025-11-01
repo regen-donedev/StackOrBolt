@@ -326,7 +326,6 @@ function initNavbarEventHandlers(domBoardState, loggerWriter, navbar) {
       let clickedCell = event.target.closest("div");
       clickedCell ??= null;
       if (
-        domBoardState.waitForWebWorker === true ||
         clickedCell === null ||
         !clickedCell instanceof HTMLDivElement ||
         (!clickedCell.classList.contains("navbarRestart") &&

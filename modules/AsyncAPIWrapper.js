@@ -69,28 +69,51 @@ function handleResponse(respMsg) {
  * @param {Worker} worker
  * @param {Object} message
  * @param {Number} timeout
- * @returns
+ * @returns {Promise<Object>|Promise<Error>}
  */
 async function dispatchWorker(worker, message, timeout = defaultTimeout) {
+  let timeoutElement;
+  let workerEventResolve;
+  let workerEventReject;
+  const messageEventHandler = function (event) {
+    const respMsg = event.data;
+    if (messageSchemeComparator(respMsg) === false) {
+      workerEventReject(
+        new Error(
+          "invalid response message format for worker: " + respMsg.toString()
+        )
+      );
+    }
+    resourceCleanUp();
+    workerEventResolve(respMsg);
+  };
+  const errorEventHandler = function (event) {
+    workerEventReject(
+      new Error("Uncaught error for worker: " + event.toString())
+    );
+  };
+  const resourceCleanUp = function () {
+    worker.removeEventListener("message", messageEventHandler);
+    worker.removeEventListener("error", errorEventHandler);
+    clearTimeout(timeoutElement);
+  };
+  const timeoutPromise = new Promise((resolve, reject) => {
+    try {
+      timeoutElement = setTimeout(() => {
+        const timeoutMessage = structuredClone(workerMessageScheme);
+        timeoutMessage.response.error = true;
+        timeoutMessage.response.message = "timeout";
+        resourceCleanUp();
+        resolve(timeoutMessage);
+      }, timeout);
+    } catch (error) {
+      reject(error);
+    }
+  });
   const workerPromise = new Promise((resolve, reject) => {
     try {
-      const messageEventHandler = function (event) {
-        worker.removeEventListener(event.type, messageEventHandler);
-        const respMsg = event.data;
-        if (messageSchemeComparator(respMsg) === false) {
-          reject(
-            new Error(
-              "invalid response message format for worker: " +
-                respMsg.toString()
-            )
-          );
-        }
-        resolve(respMsg);
-      };
-      const errorEventHandler = function (event) {
-        worker.removeEventListener(event.type, errorEventHandler);
-        reject(new Error("Uncaught error for worker: " + event.toString()));
-      };
+      workerEventResolve = resolve;
+      workerEventReject = reject;
       worker.addEventListener("message", messageEventHandler);
       worker.addEventListener("error", errorEventHandler);
       if (messageSchemeComparator(message) === false) {
@@ -100,21 +123,9 @@ async function dispatchWorker(worker, message, timeout = defaultTimeout) {
       }
       worker.postMessage(message);
     } catch (error) {
-      reject(
-        new Error("Caught exception in dispatchWorker: " + error.toString())
-      );
+      reject(error);
     }
   });
-
-  const timeoutPromise = new Promise((resolve, _) => {
-    setTimeout(() => {
-      const timeoutMessage = structuredClone(workerMessageScheme);
-      timeoutMessage.response.error = true;
-      timeoutMessage.response.message = "timeout";
-      resolve(timeoutMessage);
-    }, timeout);
-  });
-
   return Promise.race([workerPromise, timeoutPromise]);
 }
 
@@ -124,61 +135,49 @@ async function dispatchWorker(worker, message, timeout = defaultTimeout) {
  * @param {HTMLDivElement} domElement
  * @param {String} cssClass
  * @param {Number} timeout
- * @returns {Promise<Object>}
+ * @returns {Promise<void>|Promise<Error>}
  */
 async function cssTransitionEnded(
   domElement,
   cssClass,
   timeout = defaultTimeout
 ) {
-  const cssTransitionPromise = new Promise((resolve, reject) => {
+  let timeoutElement;
+  let transitionResolve;
+  const transitionEventHandler = function (event) {
+    if (
+      event.propertyName === "background-color" &&
+      event.target === domElement
+    ) {
+      resourceCleanUp();
+      transitionResolve();
+    }
+  };
+  const resourceCleanUp = function () {
+    domElement.removeEventListener("transitioncancel", transitionEventHandler);
+    domElement.removeEventListener("transitionend", transitionEventHandler);
+    clearTimeout(timeoutElement);
+  };
+  const timeoutPromise = new Promise((resolve, reject) => {
     try {
-      const transitionEndEventHandler = function (event) {
-        domElement.removeEventListener(event.type, transitionEndEventHandler);
-        if (event.propertyName === "background-color") {
-          resolve("css transition ended: " + event.toString());
-        } else {
-          reject(
-            new Error(
-              "CSS transition of an unexpected property - " + event.toString()
-            )
-          );
-        }
-      };
-      const transitionCancelEventHandler = function (event) {
-        domElement.removeEventListener(
-          event.type,
-          transitionCancelEventHandler
-        );
-        if (event.propertyName === "background-color") {
-          resolve("css transition canceled: " + event.toString());
-        } else {
-          reject(
-            new Error(
-              "CSS transition of an unexpected property - " + event.toString()
-            )
-          );
-        }
-      };
-      domElement.addEventListener("transitionend", transitionEndEventHandler);
-      domElement.addEventListener(
-        "transitioncancel",
-        transitionCancelEventHandler
-      );
-      domElement.classList.add(cssClass);
+      timeoutElement = setTimeout(() => {
+        resourceCleanUp();
+        resolve();
+      }, timeout);
     } catch (error) {
-      reject(
-        new Error("Caught error in cssTransitionEnded: " + error.toString())
-      );
+      reject(error);
     }
   });
-
-  const timeoutPromise = new Promise((resolve, _) => {
-    setTimeout(() => {
-      resolve("timeout");
-    }, timeout);
+  const cssTransitionPromise = new Promise((resolve, reject) => {
+    try {
+      transitionResolve = resolve;
+      domElement.addEventListener("transitionend", transitionEventHandler);
+      domElement.addEventListener("transitioncancel", transitionEventHandler);
+      domElement.classList.add(cssClass);
+    } catch (error) {
+      reject(error);
+    }
   });
-
   return Promise.race([cssTransitionPromise, timeoutPromise]);
 }
 
@@ -186,28 +185,41 @@ async function cssTransitionEnded(
  * This function resolves, if a new custom event
  * gets dipatched for a LoggerReader EventTarget instance.
  * @param {LoggerReader} reader
- * @returns {Promise<void>}
+ * @returns {Promise<void>|Promise<Error>}
  */
-async function autoPlayTerminated(reader) {
-  return new Promise((resolve, reject) => {
+async function autoPlayTerminated(reader, timeout = defaultTimeout) {
+  let timeoutElement;
+  let autoPlayResolve;
+  reader.eventTarget = new EventTarget();
+  const target = reader.eventTarget;
+  const autoPlayTermEventHandler = function (event) {
+    reader.eventTarget = null;
+    resourceCleanUp();
+    autoPlayResolve();
+  };
+  const resourceCleanUp = function () {
+    target.removeEventListener("autoplayterminate", autoPlayTermEventHandler);
+    clearTimeout(timeoutElement);
+  };
+  const timeoutPromise = new Promise((_, reject) => {
     try {
-      reader.eventTarget = new EventTarget();
-      const target = reader.eventTarget;
-      const autoPlayTermEventHandler = function (event) {
-        try {
-          target.removeEventListener(event.type, autoPlayTermEventHandler);
-          reader.eventTarget = null;
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      };
+      timeoutElement = setTimeout(() => {
+        throw new Error("unexpected timeout during autoplay termination");
+      }, timeout);
+    } catch (error) {
+      reject(error);
+    }
+  });
+  const autoPlayPromise = new Promise((resolve, reject) => {
+    try {
+      autoPlayResolve = resolve;
       target.addEventListener("autoplayterminate", autoPlayTermEventHandler);
       reader.autoPlayActive = false;
     } catch (error) {
       reject(error);
     }
   });
+  return Promise.race([autoPlayPromise, timeoutPromise]);
 }
 
 export {
