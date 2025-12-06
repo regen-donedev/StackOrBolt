@@ -46,6 +46,8 @@ body {
   text-align: center;
   overflow-wrap: break-word;
   word-break: break-word;
+  pointer-events: visible;
+  cursor: pointer;
 }
 body {
   display: flex;
@@ -61,6 +63,8 @@ body {
   font: inherit;
   overflow-wrap: inherit;
   word-break: inherit;
+  pointer-events: inherit;
+  cursor: inherit;
 }
 .tileColor1 {
   background-color: light-dark(
