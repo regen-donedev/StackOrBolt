@@ -25,6 +25,8 @@ function handleErrorEvent(error, isWorker = false) {
 
   // Log the single object (You can easily send this object to a server here)
   console.error("--- Application Error ---");
+  alert("app error: " + logObject.message);
+  alert(JSON.stringify(logObject, null, 2));
   console.error(JSON.stringify(logObject, null, 2));
   console.error("-------------------------");
   return JSON.stringify(logObject, null, 2);
