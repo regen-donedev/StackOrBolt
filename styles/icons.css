@@ -5,6 +5,7 @@
   left: 10%;
   width: 80%;
   height: 80%;
+  pointer-events: none;
   z-index: 0;
   opacity: 0.4;
 }
@@ -50,6 +51,8 @@
   width: 100%;
 }
 .icon2 {
+  pointer-events: visible;
+  cursor: pointer;
   fill: light-dark(var(--light-icon-color), var(--dark-icon-color));
   width: 80%;
   height: 80%;
