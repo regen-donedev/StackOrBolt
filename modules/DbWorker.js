@@ -14,7 +14,7 @@ import { LOGGER_DB_ITEMS } from "./Logger.js";
 
 const idbFactory = self.indexedDB ?? null;
 let db = null;
-const dbVersion = 36;
+const dbVersion = 37;
 let initFromScratch = false;
 
 /**
@@ -23,7 +23,7 @@ let initFromScratch = false;
  * @param {String} objStoreName
  * @param {String} indexName
  * @param {Number} indexKey
- * @returns {Number[]} - An array of game identifiers
+ * @returns {Promise<Number[]>} - An array of game identifiers
  */
 async function getKeysFromIndexOnly(objStoreName, indexName, indexKey) {
   return new Promise((resolve, reject) => {
@@ -61,7 +61,7 @@ async function getKeysFromIndexOnly(objStoreName, indexName, indexKey) {
  * where each primary key points to the logged record for a specific move on the board.
  * @param {String} objStoreName
  * @param {String} indexName
- * @returns {Object[]}
+ * @returns {Promise<Object[]>}
  */
 async function getAllIndexKeys(objStoreName, indexName) {
   return new Promise((resolve, reject) => {
